@@ -131,7 +131,7 @@ public final class EncryptUtil {
             byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             return bytesToHex(hashBytes);
         } catch (NoSuchAlgorithmException e) {
-            throw new SystemException("Hash algorithm not available: " + algorithm, e);
+            throw new SystemException("ENCRYPTION_ERROR", "Hash algorithm not available: " + algorithm, e);
         }
     }
 
@@ -165,7 +165,7 @@ public final class EncryptUtil {
             SecretKey secretKey = keyGenerator.generateKey();
             return BASE64_ENCODER.encodeToString(secretKey.getEncoded());
         } catch (NoSuchAlgorithmException e) {
-            throw new SystemException("AES algorithm not available", e);
+            throw new SystemException("ENCRYPTION_ERROR", "AES algorithm not available", e);
         }
     }
 
@@ -212,7 +212,7 @@ public final class EncryptUtil {
 
             return BASE64_ENCODER.encodeToString(encryptedData);
         } catch (Exception e) {
-            throw new SystemException("AES encryption failed", e);
+            throw new SystemException("ENCRYPTION_ERROR", "AES encryption failed", e);
         }
     }
 
@@ -234,7 +234,7 @@ public final class EncryptUtil {
             byte[] encryptedData = BASE64_DECODER.decode(encryptedText);
 
             if (encryptedData.length < GCM_IV_LENGTH) {
-                throw new SystemException("Invalid encrypted data length");
+                throw new SystemException("ENCRYPTION_ERROR", "Invalid encrypted data length");
             }
 
             // Extract IV and ciphertext
@@ -253,7 +253,7 @@ public final class EncryptUtil {
 
             return new String(plainTextBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new SystemException("AES decryption failed", e);
+            throw new SystemException("ENCRYPTION_ERROR", "AES decryption failed", e);
         }
     }
 
@@ -342,7 +342,7 @@ public final class EncryptUtil {
             byte[] decodedBytes = BASE64_DECODER.decode(base64Input);
             return new String(decodedBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new SystemException("Base64 decoding failed", e);
+            throw new SystemException("ENCRYPTION_ERROR", "Base64 decoding failed", e);
         }
     }
 
@@ -372,7 +372,7 @@ public final class EncryptUtil {
         try {
             return BASE64_DECODER.decode(base64Input);
         } catch (Exception e) {
-            throw new SystemException("Base64 decoding failed", e);
+            throw new SystemException("ENCRYPTION_ERROR", "Base64 decoding failed", e);
         }
     }
 

@@ -86,7 +86,7 @@ public class RedisDistributedLock implements DistributedLock {
             }
         } catch (Exception e) {
             log.error("Error releasing lock: {}", key, e);
-            throw new SystemException("Failed to release distributed lock: " + key, e);
+            throw new SystemException("SYSTEM_ERROR", "Failed to release distributed lock: " + key, e);
         } finally {
             lockValueHolder.remove();
         }

@@ -1,10 +1,8 @@
 package com.rbac.common.core.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.rbac.common.core.constant.CommonConstant;
-import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Unified API response format.
@@ -13,15 +11,14 @@ import java.time.LocalDateTime;
  * in the RBAC system, ensuring consistent error handling and data presentation.
  *
  * @param <T> the type of data being returned
- * @author CHANG SHOU-WEN
+ * @author RBAC System
  * @since 1.0.0
  */
-@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> {
 
     /**
-     * Response code (200 for success, error codes for failures).
+     * Response code (SUCCESS for success, error codes for failures).
      */
     private int code;
 
@@ -38,18 +35,62 @@ public class Result<T> {
     /**
      * Timestamp of the response.
      */
-    private LocalDateTime timestamp;
+    private Instant timestamp;
 
     /**
      * Trace ID for request tracking (optional).
      */
     private String traceId;
 
+    // ==================== Getters ====================
+
     /**
-     * Private constructor to enforce factory method usage.
+     * Get the response code.
+     *
+     * @return the response code
      */
+    public int getCode() {
+        return code;
+    }
+
+    /**
+     * Get the response message.
+     *
+     * @return the response message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * Get the response data payload.
+     *
+     * @return the response data
+     */
+    public T getData() {
+        return data;
+    }
+
+    /**
+     * Get the timestamp of the response.
+     *
+     * @return the timestamp
+     */
+    public Instant getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Get the trace ID.
+     *
+     * @return the trace ID
+     */
+    public String getTraceId() {
+        return traceId;
+    }
+
     private Result() {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
     }
 
     /**
@@ -64,7 +105,7 @@ public class Result<T> {
         this.code = code;
         this.message = message;
         this.data = data;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
         this.traceId = traceId;
     }
 
@@ -100,8 +141,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> success() {
-        return new Result<>(ResultCode.SUCCESS_NO_CONTENT.getCode(),
-                          ResultCode.SUCCESS_NO_CONTENT.getMessage(), null, null);
+        return new Result<>(ResultCode.SUCCESS_NO_CONTENT.getCode(), ResultCode.SUCCESS_NO_CONTENT.getMessage(), null, null);
     }
 
     /**
@@ -120,7 +160,7 @@ public class Result<T> {
     /**
      * Create an error result with ResultCode.
      *
-     * @param resultCode the result code enum
+     * @param resultCode the result code
      * @param <T> the type of data
      * @return Result instance
      */
@@ -131,13 +171,13 @@ public class Result<T> {
     /**
      * Create an error result with ResultCode and custom message.
      *
-     * @param resultCode the result code enum
-     * @param message the custom error message
+     * @param resultCode the result code
+     * @param customMessage the custom error message
      * @param <T> the type of data
      * @return Result instance
      */
-    public static <T> Result<T> error(ResultCode resultCode, String message) {
-        return new Result<>(resultCode.getCode(), message, null, null);
+    public static <T> Result<T> error(ResultCode resultCode, String customMessage) {
+        return new Result<>(resultCode.getCode(), customMessage, null, null);
     }
 
     /**
@@ -153,6 +193,18 @@ public class Result<T> {
     }
 
     /**
+     * Create an error result with code and message (String code).
+     *
+     * @param code the error code as string
+     * @param message the error message
+     * @param <T> the type of data
+     * @return Result instance
+     */
+    public static <T> Result<T> error(String code, String message) {
+        return new Result<>(Integer.parseInt(code), message, null, null);
+    }
+
+    /**
      * Create a bad request error result.
      *
      * @param message the error message
@@ -160,7 +212,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> badRequest(String message) {
-        return error(ResultCode.BAD_REQUEST, message);
+        return error(400, message);
     }
 
     /**
@@ -171,7 +223,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> unauthorized(String message) {
-        return error(ResultCode.UNAUTHORIZED, message);
+        return error(401, message);
     }
 
     /**
@@ -182,7 +234,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> forbidden(String message) {
-        return error(ResultCode.FORBIDDEN, message);
+        return error(403, message);
     }
 
     /**
@@ -193,7 +245,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> notFound(String message) {
-        return error(ResultCode.NOT_FOUND, message);
+        return error(404, message);
     }
 
     /**
@@ -204,7 +256,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> internalServerError(String message) {
-        return error(ResultCode.INTERNAL_SERVER_ERROR, message);
+        return error(500, message);
     }
 
     // ==================== Utility Methods ====================

@@ -83,7 +83,7 @@ public final class ValidationUtil {
      */
     public static void validate(Object object) {
         if (object == null) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID, "Object cannot be null");
+            throw new BusinessException("PARAMETER_INVALID", "Object cannot be null");
         }
 
         Set<ConstraintViolation<Object>> violations = VALIDATOR.validate(object);
@@ -95,7 +95,7 @@ public final class ValidationUtil {
                        .append(violation.getMessage())
                        .append("; ");
             }
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID, message.toString());
+            throw new BusinessException("PARAMETER_INVALID", message.toString());
         }
     }
 
@@ -138,7 +138,7 @@ public final class ValidationUtil {
      */
     public static void requireNonEmpty(String value, String fieldName) {
         if (StringUtil.isEmpty(value)) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s cannot be empty", fieldName));
         }
     }
@@ -158,12 +158,12 @@ public final class ValidationUtil {
         }
 
         if (value.length() < minLength) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must be at least %d characters", fieldName, minLength));
         }
 
         if (value.length() > maxLength) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must not exceed %d characters", fieldName, maxLength));
         }
     }
@@ -177,7 +177,7 @@ public final class ValidationUtil {
     public static void validateEmail(String email) {
         requireNonEmpty(email, "email");
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID, "Invalid email format");
+            throw new BusinessException("PARAMETER_INVALID", "Invalid email format");
         }
     }
 
@@ -200,7 +200,7 @@ public final class ValidationUtil {
     public static void validatePhone(String phone) {
         requireNonEmpty(phone, "phone");
         if (!PHONE_PATTERN.matcher(phone).matches()) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID, "Invalid phone number format");
+            throw new BusinessException("PARAMETER_INVALID", "Invalid phone number format");
         }
     }
 
@@ -223,7 +223,7 @@ public final class ValidationUtil {
     public static void validateUsername(String username) {
         requireNonEmpty(username, "username");
         if (!USERNAME_PATTERN.matcher(username).matches()) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 "Username must be 3-32 characters, containing only letters, numbers, underscores, and dashes");
         }
     }
@@ -247,11 +247,11 @@ public final class ValidationUtil {
     public static void validatePassword(String password) {
         requireNonEmpty(password, "password");
         if (password.length() < 8) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 "Password must be at least 8 characters long");
         }
         if (!STRONG_PASSWORD_PATTERN.matcher(password).matches()) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
         }
     }
@@ -279,7 +279,7 @@ public final class ValidationUtil {
      */
     public static void validateRange(int value, String fieldName, int min, int max) {
         if (value < min || value > max) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must be between %d and %d", fieldName, min, max));
         }
     }
@@ -295,7 +295,7 @@ public final class ValidationUtil {
      */
     public static void validateRange(long value, String fieldName, long min, long max) {
         if (value < min || value > max) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must be between %d and %d", fieldName, min, max));
         }
     }
@@ -309,7 +309,7 @@ public final class ValidationUtil {
      */
     public static void validatePositive(int value, String fieldName) {
         if (value <= 0) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must be positive", fieldName));
         }
     }
@@ -323,7 +323,7 @@ public final class ValidationUtil {
      */
     public static void validatePositive(long value, String fieldName) {
         if (value <= 0) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must be positive", fieldName));
         }
     }
@@ -337,7 +337,7 @@ public final class ValidationUtil {
      */
     public static void validateNonNegative(int value, String fieldName) {
         if (value < 0) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must not be negative", fieldName));
         }
     }
@@ -351,7 +351,7 @@ public final class ValidationUtil {
      */
     public static void validateNonNegative(long value, String fieldName) {
         if (value < 0) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must not be negative", fieldName));
         }
     }
@@ -367,7 +367,7 @@ public final class ValidationUtil {
      */
     public static void validateNotEmpty(java.util.Collection<?> collection, String fieldName) {
         if (collection == null || collection.isEmpty()) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s cannot be empty", fieldName));
         }
     }
@@ -381,7 +381,7 @@ public final class ValidationUtil {
      */
     public static void validateNotEmpty(Object[] array, String fieldName) {
         if (array == null || array.length == 0) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s cannot be empty", fieldName));
         }
     }
@@ -402,12 +402,12 @@ public final class ValidationUtil {
 
         int size = collection.size();
         if (size < minSize) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must contain at least %d items", fieldName, minSize));
         }
 
         if (size > maxSize) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("%s must not contain more than %d items", fieldName, maxSize));
         }
     }
@@ -422,7 +422,7 @@ public final class ValidationUtil {
      */
     public static void validateTenantId(Long tenantId) {
         if (tenantId == null) {
-            throw new BusinessException(ErrorCode.TENANT_NOT_FOUND, "Tenant ID cannot be null");
+            throw new BusinessException("TENANT_NOT_FOUND", "Tenant ID cannot be null");
         }
         validatePositive(tenantId, "tenantId");
         // Additional tenant ID validation can be added here
@@ -436,7 +436,7 @@ public final class ValidationUtil {
      */
     public static void validateUserId(Long userId) {
         if (userId == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND, "User ID cannot be null");
+            throw new BusinessException("USER_NOT_FOUND", "User ID cannot be null");
         }
         validatePositive(userId, "userId");
     }
@@ -453,7 +453,7 @@ public final class ValidationUtil {
         validatePositive(pageSize, "pageSize");
 
         if (pageSize > CommonConstant.MAX_PAGE_SIZE) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 String.format("Page size cannot exceed %d", CommonConstant.MAX_PAGE_SIZE));
         }
     }
@@ -478,7 +478,7 @@ public final class ValidationUtil {
             }
         }
 
-        throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+        throw new BusinessException("PARAMETER_INVALID",
             String.format("Invalid sort field: %s", sortField));
     }
 
@@ -495,7 +495,7 @@ public final class ValidationUtil {
 
         String lowerOrder = sortOrder.toLowerCase();
         if (!"asc".equals(lowerOrder) && !"desc".equals(lowerOrder)) {
-            throw new BusinessException(ErrorCode.PARAMETER_INVALID,
+            throw new BusinessException("PARAMETER_INVALID",
                 "Sort order must be 'asc' or 'desc'");
         }
     }

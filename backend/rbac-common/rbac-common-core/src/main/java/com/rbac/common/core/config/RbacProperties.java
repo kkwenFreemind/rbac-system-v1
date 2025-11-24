@@ -9,6 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * RBAC System Configuration Properties
  *
@@ -47,6 +50,18 @@ public class RbacProperties {
      */
     @NotNull
     private AuditProperties audit = new AuditProperties();
+
+    /**
+     * CORS configuration properties
+     */
+    @NotNull
+    private CorsProperties cors = new CorsProperties();
+
+    /**
+     * API versioning configuration properties
+     */
+    @NotNull
+    private ApiVersionProperties apiVersion = new ApiVersionProperties();
 
     /**
      * Tenant configuration properties
@@ -125,5 +140,92 @@ public class RbacProperties {
          * Whether audit operations should be performed asynchronously
          */
         private boolean async = true;
+    }
+
+    /**
+     * CORS configuration properties
+     */
+    @Data
+    public static class CorsProperties {
+        /**
+         * Whether CORS is enabled
+         */
+        private boolean enabled = true;
+
+        /**
+         * Allowed origins for CORS requests
+         */
+        private List<String> allowedOrigins = new ArrayList<>();
+
+        /**
+         * Allowed HTTP methods for CORS requests
+         */
+        private List<String> allowedMethods = new ArrayList<>();
+
+        /**
+         * Allowed headers for CORS requests
+         */
+        private List<String> allowedHeaders = new ArrayList<>();
+
+        /**
+         * Whether credentials are allowed in CORS requests
+         */
+        private boolean allowCredentials = true;
+
+        /**
+         * Max age for preflight requests cache (seconds)
+         */
+        private long maxAge = 3600;
+
+        /**
+         * Exposed headers in CORS responses
+         */
+        private List<String> exposedHeaders = new ArrayList<>();
+    }
+
+    /**
+     * API versioning configuration properties
+     */
+    @Data
+    public static class ApiVersionProperties {
+        /**
+         * Whether API versioning is enabled
+         */
+        private boolean enabled = true;
+
+        /**
+         * Default API version
+         */
+        private String defaultVersion = "v1";
+
+        /**
+         * Supported API versions
+         */
+        private List<String> supportedVersions = new ArrayList<>();
+
+        /**
+         * API version header name
+         */
+        private String headerName = "X-API-Version";
+
+        /**
+         * API version parameter name
+         */
+        private String parameterName = "version";
+
+        /**
+         * Whether to include version in URL path
+         */
+        private boolean urlPathEnabled = true;
+
+        /**
+         * API base path
+         */
+        private String basePath = "/api";
+
+        /**
+         * Whether to allow unversioned requests (fallback to default version)
+         */
+        private boolean allowUnversionedRequests = true;
     }
 }

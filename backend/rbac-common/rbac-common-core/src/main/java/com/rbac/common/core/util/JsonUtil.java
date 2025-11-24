@@ -81,7 +81,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to serialize object to JSON", e);
+            throw new SystemException("JSON_ERROR", "Failed to serialize object to JSON", e);
         }
     }
 
@@ -99,7 +99,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to serialize object to pretty JSON", e);
+            throw new SystemException("JSON_ERROR", "Failed to serialize object to pretty JSON", e);
         }
     }
 
@@ -117,7 +117,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.writeValueAsBytes(object);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to serialize object to JSON bytes", e);
+            throw new SystemException("JSON_ERROR", "Failed to serialize object to JSON bytes", e);
         }
     }
 
@@ -139,7 +139,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, clazz);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to deserialize JSON to object", e);
+            throw new SystemException("JSON_ERROR", "Failed to deserialize JSON to object", e);
         }
     }
 
@@ -159,7 +159,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(json, typeReference);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to deserialize JSON to object", e);
+            throw new SystemException("JSON_ERROR", "Failed to deserialize JSON to object", e);
         }
     }
 
@@ -179,7 +179,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(jsonBytes, clazz);
         } catch (Exception e) {
-            throw new SystemException("Failed to deserialize JSON bytes to object", e);
+            throw new SystemException("JSON_ERROR", "Failed to deserialize JSON bytes to object", e);
         }
     }
 
@@ -199,9 +199,9 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.readTree(json);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to parse JSON string", e);
+            throw new SystemException("JSON_ERROR", "Failed to parse JSON string", e);
         } catch (Exception e) {
-            throw new SystemException("Unexpected error parsing JSON string", e);
+            throw new SystemException("JSON_ERROR", "Unexpected error parsing JSON string", e);
         }
     }
 
@@ -219,7 +219,7 @@ public final class JsonUtil {
         try {
             return OBJECT_MAPPER.writeValueAsString(jsonNode);
         } catch (JsonProcessingException e) {
-            throw new SystemException("Failed to convert JsonNode to JSON string", e);
+            throw new SystemException("JSON_ERROR", "Failed to convert JsonNode to JSON string", e);
         }
     }
 
