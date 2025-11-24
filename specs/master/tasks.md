@@ -115,36 +115,36 @@
 
 ### FR2.1 & FR2.5: 基礎實體類別
 
-- [ ] T035 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/BaseEntity.java 建立 BaseEntity.java（含 Snowflake ID）
-- [ ] T036 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/TenantEntity.java 建立 TenantEntity.java（extends BaseEntity）
-- [ ] T037 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/AuditEntity.java 建立 AuditEntity.java（extends TenantEntity）
+- [X] T035 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/BaseEntity.java 建立 BaseEntity.java（含 Snowflake ID）
+- [X] T036 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/TenantEntity.java 建立 TenantEntity.java（extends BaseEntity）
+- [X] T037 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/entity/AuditEntity.java 建立 AuditEntity.java（extends TenantEntity）
 
 ### FR2.4: 租戶上下文管理
 
-- [ ] T038 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/context/TenantContextHolder.java 建立 TenantContextHolder.java
+- [X] T038 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/context/TenantContextHolder.java 建立 TenantContextHolder.java
 
 ### FR2.2: MyBatis 租戶攻擊器
 
-- [ ] T039 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/MyBatisPlusConfig.java 建立 MyBatisPlusConfig.java（含 TenantLineInnerInterceptor）
+- [X] T039 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/MyBatisPlusConfig.java 建立 MyBatisPlusConfig.java（含 TenantLineInnerInterceptor）
 
 ### FR2.3: MetaObjectHandler 用於自動填充
 
-- [ ] T040 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/handler/AuditMetaObjectHandler.java 建立 AuditMetaObjectHandler.java（自動填充 tenantId 和稽核欄位）
+- [X] T040 [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/handler/AuditMetaObjectHandler.java 建立 AuditMetaObjectHandler.java（自動填充 tenantId 和稽核欄位）
 
 ### FR2.6 & FR2.7: 資料庫配置
 
-- [ ] T041 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/DataSourceConfig.java 建立 DataSourceConfig.java（HikariCP）
-- [ ] T042 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/DynamicDataSourceRouter.java 建立 DynamicDataSourceRouter.java（為未來讀寫分離預留）
+- [X] T041 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/DataSourceConfig.java 建立 DataSourceConfig.java（HikariCP）
+- [X] T042 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/config/DynamicDataSourceRouter.java 建立 DynamicDataSourceRouter.java（為未來讀寫分離預留）
 
 ### FR2.8: 資料庫工具
 
-- [ ] T043 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/util/SqlUtil.java 建立 SqlUtil.java
+- [X] T043 [P] [FR2] 在 backend/rbac-common/rbac-common-database/src/main/java/com/rbac/common/database/util/SqlUtil.java 建立 SqlUtil.java
 
 ### FR2 整合測試（關鍵 - 租戶隔離）
 
-- [ ] T044 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/context/TenantContextHolderTest.java 建立 TenantContextHolderTest.java（測試 ThreadLocal 隔離）
-- [ ] T045 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/integration/TenantIsolationIntegrationTest.java 建立 TenantIsolationIntegrationTest.java（使用 Testcontainers 測試 tenant_id 自動注入）
-- [ ] T046 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/context/ThreadLocalCleanupTest.java 建立 ThreadLocalCleanupTest.java（驗證無執行緒池污染）
+- [X] T044 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/context/TenantContextHolderTest.java 建立 TenantContextHolderTest.java（測試 ThreadLocal 隔離）
+- [X] T045 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/integration/TenantIsolationIntegrationTest.java 建立 TenantIsolationIntegrationTest.java（使用 Testcontainers 測試 tenant_id 自動注入）
+- [X] T046 [FR2] 在 backend/rbac-common/rbac-common-database/src/test/java/com/rbac/common/database/context/ThreadLocalCleanupTest.java 建立 ThreadLocalCleanupTest.java（驗證無執行緒池污染）
 
 **檢查點**：Common Database 模組完成 - 所有實體現在可以使用租戶隔離和稽核追蹤
 
@@ -160,29 +160,29 @@
 
 ### FR3.1 & FR3.4: Redis 配置
 
-- [ ] T047 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/config/RedisConfig.java 建立 RedisConfig.java（含 Lettuce 和 Jackson 序列化）
-- [ ] T048 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/config/RedisProperties.java 建立 RedisProperties.java
+- [X] T047 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/config/RedisConfig.java 建立 RedisConfig.java（含 Lettuce 和 Jackson 序列化）
+- [X] T048 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/config/RedisProperties.java 建立 RedisProperties.java
 
 ### FR3.2 & FR3.5: 快取服務
 
-- [ ] T049 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/CacheService.java 建立 CacheService.java 介面
-- [ ] T050 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/RedisCacheService.java 建立 RedisCacheService.java（實作 CacheService）
-- [ ] T051 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/CacheKeyUtil.java 建立 CacheKeyUtil.java
+- [X] T049 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/CacheService.java 建立 CacheService.java 介面
+- [X] T050 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/RedisCacheService.java 建立 RedisCacheService.java（實作 CacheService）
+- [X] T051 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/util/CacheKeyUtil.java 建立 CacheKeyUtil.java
 
 ### FR3.3: 分散式鎖
 
-- [ ] T052 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/DistributedLock.java 建立 DistributedLock.java 介面
-- [ ] T053 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/RedisDistributedLock.java 建立 RedisDistributedLock.java（實作 DistributedLock 含 Lua 腳本）
-- [ ] T054 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/LockKeyGenerator.java 建立 LockKeyGenerator.java
+- [X] T052 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/DistributedLock.java 建立 DistributedLock.java 介面
+- [X] T053 [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/RedisDistributedLock.java 建立 RedisDistributedLock.java（實作 DistributedLock 含 Lua 腳本）
+- [X] T054 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/main/java/com/rbac/common/redis/lock/LockKeyGenerator.java 建立 LockKeyGenerator.java
 
 ### FR3 單元測試
 
-- [ ] T055 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/util/CacheServiceTest.java 建立 CacheServiceTest.java
-- [ ] T056 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/util/CacheKeyUtilTest.java 建立 CacheKeyUtilTest.java
+- [X] T055 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/util/CacheServiceTest.java 建立 CacheServiceTest.java
+- [X] T056 [P] [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/util/CacheKeyUtilTest.java 建立 CacheKeyUtilTest.java
 
 ### FR3 整合測試（關鍵 - 分散式鎖）
 
-- [ ] T057 [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/lock/DistributedLockIntegrationTest.java 建立 DistributedLockIntegrationTest.java（使用 Testcontainers Redis 測試並發存取）
+- [X] T057 [FR3] 在 backend/rbac-common/rbac-common-redis/src/test/java/com/rbac/common/redis/lock/DistributedLockIntegrationTest.java 建立 DistributedLockIntegrationTest.java（使用 Testcontainers Redis 測試並發存取）
 
 **檢查點**：Common Redis 模組完成 - 快取和分散式鎖定可用於所有業務模組
 
