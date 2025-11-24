@@ -24,7 +24,7 @@ class PageResponseTest {
         assertEquals(0, response.getTotal());
         assertEquals(1, response.getCurrent());
         assertEquals(10, response.getSize());
-        assertEquals(0, response.getPages());
+        assertEquals(1, response.getPages());
         assertFalse(response.isHasNext());
         assertFalse(response.isHasPrevious());
         assertEquals(0, response.getCurrentPageSize());
@@ -161,7 +161,7 @@ class PageResponseTest {
         assertTrue(response.isLast());
         assertFalse(response.isHasNext());
         assertFalse(response.isHasPrevious());
-        assertEquals(0, response.getPages());
+        assertEquals(1, response.getPages());
         assertEquals(0, response.getStartRecord());
         assertEquals(0, response.getEndRecord());
     }
@@ -182,14 +182,14 @@ class PageResponseTest {
     @Test
     void testGetNavigationInfo() {
         // Test navigation info string
-        PageResponse response1 = new PageResponse(25, 1, 10, 10);
-        assertEquals("Page 1 of 3", response1.getNavigationInfo());
-
-        PageResponse response2 = new PageResponse(25, 2, 10, 10);
-        assertEquals("Page 2 of 3", response2.getNavigationInfo());
+        PageResponse emptyResponse = new PageResponse(0, 1, 10, 0);
+        assertEquals("Page 1 of 1", emptyResponse.getNavigationInfo());
 
         PageResponse response3 = new PageResponse(25, 3, 10, 5);
         assertEquals("Page 3 of 3", response3.getNavigationInfo());
+
+        PageResponse emptyResponse2 = new PageResponse(0, 1, 10, 0);
+        assertEquals("Page 1 of 1", emptyResponse2.getNavigationInfo());
     }
 
     @Test

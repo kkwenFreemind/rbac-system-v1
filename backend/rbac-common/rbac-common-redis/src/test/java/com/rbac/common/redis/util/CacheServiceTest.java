@@ -1,6 +1,7 @@
 package com.rbac.common.redis.util;
 
 import com.rbac.common.core.exception.SystemException;
+import com.rbac.common.redis.config.RedisProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,12 +33,15 @@ class CacheServiceTest {
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
+    @Mock
+    private RedisProperties redisProperties;
+
     private CacheService cacheService;
 
     @BeforeEach
     void setUp() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        cacheService = new RedisCacheService(redisTemplate);
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        cacheService = new RedisCacheService(redisTemplate, redisProperties);
     }
 
     @Test
@@ -88,13 +92,13 @@ class CacheServiceTest {
         // Given
         String key = "test:key";
         String value = "test-value";
-        when(valueOperations.setIfAbsent(anyString(), any(), any(Duration.class))).thenReturn(true);
+        when(redisProperties.getDefaultTtl()).thenReturn(3600);
 
         // When
         cacheService.set(key, value);
 
         // Then
-        verify(valueOperations).set(eq(key), eq(value), any(Duration.class));
+        verify(valueOperations).set(eq(key), eq(value), eq(Duration.ofSeconds(3600L)));
     }
 
     @Test
@@ -129,7 +133,7 @@ class CacheServiceTest {
     void delete_WithExistingKey_ShouldReturnTrue() {
         // Given
         String key = "test:key";
-        when(redisTemplate.delete(key)).thenReturn(1L);
+        when(redisTemplate.delete(key)).thenReturn(Boolean.TRUE);
 
         // When
         boolean result = cacheService.delete(key);
@@ -143,7 +147,7 @@ class CacheServiceTest {
     void delete_WithNonExistingKey_ShouldReturnFalse() {
         // Given
         String key = "test:key";
-        when(redisTemplate.delete(key)).thenReturn(0L);
+        when(redisTemplate.delete(key)).thenReturn(Boolean.FALSE);
 
         // When
         boolean result = cacheService.delete(key);
@@ -165,7 +169,7 @@ class CacheServiceTest {
         // Given
         String pattern = "test:*";
         when(redisTemplate.keys(pattern)).thenReturn(java.util.Set.of("test:key1", "test:key2"));
-        when(redisTemplate.delete(anyCollection())).thenReturn(2L);
+        doReturn(Long.valueOf(2)).when(redisTemplate).delete(anyCollection());
 
         // When
         long result = cacheService.deletePattern(pattern);
@@ -260,7 +264,7 @@ class CacheServiceTest {
         // Given
         String key = "test:counter";
         long delta = 5L;
-        when(valueOperations.increment(key, delta)).thenReturn(10L);
+        when(valueOperations.increment(key, delta)).thenReturn(Long.valueOf(10));
 
         // When
         Long result = cacheService.increment(key, delta);
@@ -282,7 +286,7 @@ class CacheServiceTest {
         // Given
         String key = "test:counter";
         long delta = 3L;
-        when(valueOperations.decrement(key, delta)).thenReturn(7L);
+        when(valueOperations.decrement(key, delta)).thenReturn(Long.valueOf(7));
 
         // When
         Long result = cacheService.decrement(key, delta);

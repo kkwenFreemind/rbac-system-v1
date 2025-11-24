@@ -345,16 +345,16 @@ public final class StringUtil {
      * Mask sensitive information in string (e.g., password, token).
      *
      * @param str the string to mask
-     * @param visibleChars number of characters to keep visible at start and end
+     * @param visibleChars number of characters to keep visible at start
      * @return masked string
      */
     public static String mask(String str, int visibleChars) {
-        if (isEmpty(str) || str.length() <= visibleChars * 2) {
+        if (isEmpty(str) || str.length() <= visibleChars + 2) {
             return str;
         }
         String start = str.substring(0, visibleChars);
-        String end = str.substring(str.length() - visibleChars);
-        String mask = "*".repeat(Math.min(10, str.length() - visibleChars * 2));
+        String end = str.substring(str.length() - 2);
+        String mask = "*".repeat(Math.min(10, str.length() - visibleChars - 2));
         return start + mask + end;
     }
 

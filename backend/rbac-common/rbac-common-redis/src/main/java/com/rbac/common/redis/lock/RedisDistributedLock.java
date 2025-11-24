@@ -3,6 +3,8 @@ package com.rbac.common.redis.lock;
 import com.rbac.common.core.exception.SystemException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,8 @@ import java.util.function.Supplier;
 @Component
 @RequiredArgsConstructor
 public class RedisDistributedLock implements DistributedLock {
+
+    private static final Logger log = LoggerFactory.getLogger(RedisDistributedLock.class);
 
     private final StringRedisTemplate redisTemplate;
 

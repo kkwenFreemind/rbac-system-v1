@@ -255,7 +255,7 @@ class StringUtilTest {
         assertNull(StringUtil.mask(null, 2));
         assertEquals("", StringUtil.mask("", 2));
         assertEquals("test", StringUtil.mask("test", 2));
-        assertEquals("te**st", StringUtil.mask("test123", 2));
+        assertEquals("te***23", StringUtil.mask("test123", 2));
         assertEquals("12**********90", StringUtil.mask("12345678901234567890", 2));
         assertEquals("abc**********yz", StringUtil.mask("abcdefghijklmnopqrstuvwxyz", 3));
     }

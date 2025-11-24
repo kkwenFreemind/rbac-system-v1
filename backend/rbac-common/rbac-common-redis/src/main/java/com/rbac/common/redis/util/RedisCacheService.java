@@ -1,11 +1,13 @@
 package com.rbac.common.redis.util;
 
+import com.rbac.common.core.exception.SystemException;
 import com.rbac.common.redis.config.RedisProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +36,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public <T> T get(String key, Class<T> type) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Object value = redisTemplate.opsForValue().get(key);
             if (value == null) {
@@ -45,14 +50,17 @@ public class RedisCacheService implements CacheService {
             return type.cast(value);
         } catch (Exception e) {
             log.error("Failed to get cache value for key: {}", key, e);
-            return null;
+            throw new SystemException("REDIS_ERROR", "Failed to get cache value for key: " + key, e);
         }
     }
 
     @Override
     public void set(String key, Object value, long ttl) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
-            redisTemplate.opsForValue().set(key, value, ttl, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttl));
             log.debug("Set cache key: {} with TTL: {} seconds", key, ttl);
         } catch (Exception e) {
             log.error("Failed to set cache value for key: {}", key, e);
@@ -61,11 +69,17 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public void set(String key, Object value) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         set(key, value, redisProperties.getDefaultTtl());
     }
 
     @Override
     public boolean delete(String key) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Boolean result = redisTemplate.delete(key);
             boolean deleted = Boolean.TRUE.equals(result);
@@ -81,6 +95,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public long deletePattern(String pattern) {
+        if (pattern == null || pattern.trim().isEmpty()) {
+            throw new IllegalArgumentException("Pattern cannot be null or empty");
+        }
         try {
             Set<String> keys = redisTemplate.keys(pattern);
             if (keys == null || keys.isEmpty()) {
@@ -100,6 +117,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public boolean exists(String key) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Boolean result = redisTemplate.hasKey(key);
             return Boolean.TRUE.equals(result);
@@ -111,6 +131,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public boolean expire(String key, long ttl) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Boolean result = redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
             boolean expired = Boolean.TRUE.equals(result);
@@ -126,6 +149,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public Long increment(String key, long delta) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Long result = redisTemplate.opsForValue().increment(key, delta);
             log.debug("Incremented key: {} by {} to {}", key, delta, result);
@@ -138,6 +164,9 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public Long decrement(String key, long delta) {
+        if (key == null || key.trim().isEmpty()) {
+            throw new IllegalArgumentException("Key cannot be null or empty");
+        }
         try {
             Long result = redisTemplate.opsForValue().decrement(key, delta);
             log.debug("Decremented key: {} by {} to {}", key, delta, result);

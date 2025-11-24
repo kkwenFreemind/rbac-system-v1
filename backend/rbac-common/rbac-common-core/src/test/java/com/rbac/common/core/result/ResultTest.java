@@ -15,8 +15,8 @@ class ResultTest {
     @Test
     void testSuccessWithData() {
         // Test success result with data
-        String data = "test data";
-        Result<String> result = Result.success(data);
+        Integer data = 42;
+        Result<Integer> result = Result.success(data);
 
         assertTrue(result.isSuccess());
         assertFalse(result.isError());

@@ -30,24 +30,50 @@ public class CacheKeyUtil {
      * @return 格式化的快取鍵
      */
     public String generateKey(String module, String type, String id) {
-        return generateKey(module, type, id, getCurrentTenantId());
+        if (module == null || module.trim().isEmpty()) {
+            throw new IllegalArgumentException("Module cannot be null or empty");
+        }
+        if (type == null || type.trim().isEmpty()) {
+            throw new IllegalArgumentException("Type cannot be null or empty");
+        }
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Id cannot be null or empty");
+        }
+        // 格式: {prefix}:{module}:{type}:{id}
+        return String.format("%s:%s:%s:%s",
+            redisProperties.getKeyPrefix(),
+            module,
+            type,
+            id);
     }
 
     /**
      * 生成帶有指定租戶的快取鍵
      *
+     * @param tenantId 租戶 ID
      * @param module 模組名稱（例如："user", "role"）
      * @param type 資料類型（例如："info", "permissions"）
      * @param id 資源 ID
-     * @param tenantId 租戶 ID
      * @return 格式化的快取鍵
      */
-    public String generateKey(String module, String type, String id, String tenantId) {
-        // 格式: {prefix}:{module}:{tenantId}:{type}:{id}
+    public String generateKey(String tenantId, String module, String type, String id) {
+        if (tenantId == null || tenantId.trim().isEmpty()) {
+            throw new IllegalArgumentException("TenantId cannot be null or empty");
+        }
+        if (module == null || module.trim().isEmpty()) {
+            throw new IllegalArgumentException("Module cannot be null or empty");
+        }
+        if (type == null || type.trim().isEmpty()) {
+            throw new IllegalArgumentException("Type cannot be null or empty");
+        }
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Id cannot be null or empty");
+        }
+        // 格式: {prefix}:{tenantId}:{module}:{type}:{id}
         return String.format("%s:%s:%s:%s:%s",
             redisProperties.getKeyPrefix(),
-            module,
             tenantId,
+            module,
             type,
             id);
     }
@@ -56,27 +82,51 @@ public class CacheKeyUtil {
      * 生成使用者快取鍵
      *
      * @param userId 使用者 ID
-     * @return 鍵格式："{prefix}:user:{tenantId}:info:{userId}"
+     * @return 鍵格式："{prefix}:user:info:{userId}"
      */
     public String userKey(Long userId) {
         return generateKey("user", "info", userId.toString());
     }
 
     /**
+     * 生成使用者快取鍵（指定租戶和類型）
+     *
+     * @param tenantId 租戶 ID
+     * @param type 資料類型
+     * @param userId 使用者 ID
+     * @return 鍵格式："{prefix}:{tenantId}:user:{type}:{userId}"
+     */
+    public String userKey(String tenantId, String type, Long userId) {
+        return generateKey(tenantId, "user", type, userId.toString());
+    }
+
+    /**
      * 生成角色快取鍵
      *
      * @param roleId 角色 ID
-     * @return 鍵格式："{prefix}:role:{tenantId}:info:{roleId}"
+     * @return 鍵格式："{prefix}:role:info:{roleId}"
      */
     public String roleKey(Long roleId) {
         return generateKey("role", "info", roleId.toString());
     }
 
     /**
+     * 生成角色快取鍵（指定租戶和類型）
+     *
+     * @param tenantId 租戶 ID
+     * @param type 資料類型
+     * @param roleId 角色 ID
+     * @return 鍵格式："{prefix}:{tenantId}:role:{type}:{roleId}"
+     */
+    public String roleKey(String tenantId, String type, Long roleId) {
+        return generateKey(tenantId, "role", type, roleId.toString());
+    }
+
+    /**
      * 生成使用者權限快取鍵
      *
      * @param userId 使用者 ID
-     * @return 鍵格式："{prefix}:user:{tenantId}:permissions:{userId}"
+     * @return 鍵格式："{prefix}:user:permissions:{userId}"
      */
     public String userPermissionsKey(Long userId) {
         return generateKey("user", "permissions", userId.toString());
@@ -86,7 +136,7 @@ public class CacheKeyUtil {
      * 生成角色權限快取鍵
      *
      * @param roleId 角色 ID
-     * @return 鍵格式："{prefix}:role:{tenantId}:permissions:{roleId}"
+     * @return 鍵格式："{prefix}:role:permissions:{roleId}"
      */
     public String rolePermissionsKey(Long roleId) {
         return generateKey("role", "permissions", roleId.toString());
@@ -96,10 +146,35 @@ public class CacheKeyUtil {
      * 生成權限快取鍵
      *
      * @param permissionId 權限 ID
-     * @return 鍵格式："{prefix}:permission:{tenantId}:info:{permissionId}"
+     * @return 鍵格式："{prefix}:permission:info:{permissionId}"
      */
     public String permissionKey(Long permissionId) {
         return generateKey("permission", "info", permissionId.toString());
+    }
+
+    /**
+     * 生成用於刪除某類型所有鍵的模式（指定租戶）
+     *
+     * @param tenantId 租戶 ID
+     * @param module 模組名稱
+     * @param type 資料類型
+     * @return 模式格式："{prefix}:{tenantId}:{module}:{type}:*"
+     */
+    public String pattern(String tenantId, String module, String type) {
+        if (tenantId == null || tenantId.trim().isEmpty()) {
+            throw new IllegalArgumentException("TenantId cannot be null or empty");
+        }
+        if (module == null || module.trim().isEmpty()) {
+            throw new IllegalArgumentException("Module cannot be null or empty");
+        }
+        if (type == null || type.trim().isEmpty()) {
+            throw new IllegalArgumentException("Type cannot be null or empty");
+        }
+        return String.format("%s:%s:%s:%s:*",
+            redisProperties.getKeyPrefix(),
+            tenantId,
+            module,
+            type);
     }
 
     /**
@@ -107,73 +182,48 @@ public class CacheKeyUtil {
      *
      * @param module 模組名稱
      * @param type 資料類型
-     * @return 模式格式："{prefix}:{module}:{tenantId}:{type}:*"
+     * @return 模式格式："{prefix}:{module}:{type}:*"
      */
     public String pattern(String module, String type) {
-        return pattern(module, type, getCurrentTenantId());
-    }
-
-    /**
-     * 生成用於刪除某類型所有鍵的模式（指定租戶）
-     *
-     * @param module 模組名稱
-     * @param type 資料類型
-     * @param tenantId 租戶 ID
-     * @return 模式格式："{prefix}:{module}:{tenantId}:{type}:*"
-     */
-    public String pattern(String module, String type, String tenantId) {
-        return String.format("%s:%s:%s:%s:*",
+        if (module == null || module.trim().isEmpty()) {
+            throw new IllegalArgumentException("Module cannot be null or empty");
+        }
+        if (type == null || type.trim().isEmpty()) {
+            throw new IllegalArgumentException("Type cannot be null or empty");
+        }
+        return String.format("%s:%s:%s:*",
             redisProperties.getKeyPrefix(),
             module,
-            tenantId,
             type);
     }
 
     /**
      * 生成使用者相關鍵的模式
      *
-     * @return 模式格式："{prefix}:user:{tenantId}:*:*"
+     * @return 模式格式："{prefix}:user:*:*"
      */
     public String userPattern() {
-        return String.format("%s:user:%s:*:*",
-            redisProperties.getKeyPrefix(),
-            getCurrentTenantId());
+        return String.format("%s:user:*:*",
+            redisProperties.getKeyPrefix());
     }
 
     /**
      * 生成角色相關鍵的模式
      *
-     * @return 模式格式："{prefix}:role:{tenantId}:*:*"
+     * @return 模式格式："{prefix}:role:*:*"
      */
     public String rolePattern() {
-        return String.format("%s:role:%s:*:*",
-            redisProperties.getKeyPrefix(),
-            getCurrentTenantId());
+        return String.format("%s:role:*:*",
+            redisProperties.getKeyPrefix());
     }
 
     /**
      * 生成權限相關鍵的模式
      *
-     * @return 模式格式："{prefix}:permission:{tenantId}:*:*"
+     * @return 模式格式："{prefix}:permission:*:*"
      */
     public String permissionPattern() {
-        return String.format("%s:permission:%s:*:*",
-            redisProperties.getKeyPrefix(),
-            getCurrentTenantId());
-    }
-
-    /**
-     * 獲取當前租戶 ID
-     *
-     * 注意：此方法應從 TenantContextHolder 獲取租戶 ID
-     * 為了避免循環依賴，這裡使用簡單的實現
-     * 在實際使用時，應注入 TenantContextHolder
-     *
-     * @return 當前租戶 ID，預設為 "default"
-     */
-    private String getCurrentTenantId() {
-        // TODO: 注入 TenantContextHolder 並呼叫 getTenantId()
-        // 目前返回預設值以避免編譯錯誤
-        return "default";
+        return String.format("%s:permission:*:*",
+            redisProperties.getKeyPrefix());
     }
 }

@@ -56,6 +56,7 @@ public class PageResponse {
      * Default constructor.
      */
     public PageResponse() {
+        this.pages = calculatePages(total, size);
     }
 
     /**
@@ -112,7 +113,10 @@ public class PageResponse {
      */
     private int calculatePages(long total, int size) {
         if (size <= 0) {
-            return 0;
+            return 1; // at least 1 page
+        }
+        if (total <= 0) {
+            return 1; // empty result has 1 page
         }
         return (int) Math.ceil((double) total / size);
     }
@@ -168,7 +172,7 @@ public class PageResponse {
      * @return start record number
      */
     public long getStartRecord() {
-        if (current <= 0 || size <= 0) {
+        if (current <= 0 || size <= 0 || total == 0 || currentPageSize == 0) {
             return 0;
         }
         return (long) (current - 1) * size + 1;
