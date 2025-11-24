@@ -240,7 +240,7 @@
 
 - [X] T071 [P] 在 backend/rbac-common/ 建立 README.md，包含模組概述和使用範例
 - [X] T072 [P] 在 backend/rbac-common/ 建立 CHANGELOG.md，記錄初始版本
-- [ ] T073 在 backend/rbac-common/rbac-common-web/src/main/resources 建立 logback-spring.xml，包含 Trace ID 的 MDC 模式
+- [X] T073 在 backend/rbac-common/rbac-common-web/src/main/resources 建立 logback-spring.xml，包含 Trace ID 的 MDC 模式
 - [ ] T074 為所有公開 API 新增 Javadoc 註解（CacheService、DistributedLock、UserContext、Result 等）
 - [ ] T075 執行 mvn clean install 以驗證所有模組編譯成功
 - [ ] T076 執行 mvn test 以確保所有單元測試和整合測試通過
