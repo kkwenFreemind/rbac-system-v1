@@ -1,50 +1,340 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+<<<<<<< HEAD
+同步影響報告
+==================
+版本變更：Template → 1.0.0
+變更類型：初始憲章建立
 
-## Core Principles
+修改的原則：
+- 所有原則均為新定義（共 6 項）
+- 焦點：具備低耦合架構的多租戶 RBAC 系統
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+新增章節：
+- 核心原則（6 項原則）
+- 安全性與合規要求
+- 品質標準
+- 治理
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+模板狀態：
+✅ plan-template.md - 已對齊（憲章檢查章節相容）
+✅ spec-template.md - 已對齊（需求與測試結構相容）
+✅ tasks-template.md - 已對齊（任務分類反映原則）
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+後續待辦事項：
+- 無 - 所有佔位符已根據專案文件解決
+-->
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+# 多租戶 RBAC 系統憲章
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## 核心原則
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### I. 模組化低耦合架構（不可妥協）
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+每個模組必須具有單一、明確定義的職責，並與其他模組保持最小依賴。模組之間只能透過明確定義的介面（Java 介面或抽象類別）進行通信，絕不能透過具體實作。嚴禁跨模組邊界直接實例化類別——必須使用依賴注入（Spring @Autowired，建議使用建構子注入）。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**理由**：本系統設計用於長期維護，並具備從單體架構演進到微服務的潛力。低耦合使模組能夠獨立開發、測試和部署。強制執行基於介面的通信可防止緊耦合，避免阻礙未來的架構變更。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**執行方式**：
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+- 所有跨模組依賴必須基於介面
+- 模組邊界必須與以下項目對齊：Auth（認證）、User（使用者）、Tenant（租戶）、Permission（權限）、Security Defense（安全防護）、Audit（稽核）、Trace（追蹤）
+- 跨模組資料傳輸必須使用 DTO（資料傳輸物件），絕不使用領域實體
+- 嚴格禁止模組之間的循環依賴
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### II. 預設多租戶隔離
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+每個資料庫表都必須包含 `tenant_id` 欄位（除非系統層級表明確標記為共享）。每個查詢都必須自動按租戶上下文進行過濾。租戶上下文必須在 API Gateway/Filter 層建立，並透過 `TenantContextHolder`（執行緒本地儲存）傳播。任何繞過租戶過濾的程式碼都必須明確說明理由並經過審查。
+
+**理由**：租戶資料洩漏在 SaaS 系統中代表災難性的安全性和合規性失敗。將隔離設為預設可防止意外的跨租戶資料存取。此原則保護客戶隱私和企業聲譽。
+
+**執行方式**：
+
+- 使用 MyBatis 攔截器或 Spring Data JPA 監聽器自動注入 `tenant_id` 過濾條件
+- 程式碼審查必須驗證所有查詢都包含租戶過濾
+- 整合測試必須驗證租戶隔離
+- 手動 SQL 查詢必須記錄並說明理由
+
+### III. 安全性優先開發
+
+安全控制必須在多個層級實作：API Gateway（限流、IP 過濾）、應用層（認證、授權）和資料層（加密、存取控制）。認證必須使用短期有效的 JWT token（建議 15 分鐘），並搭配 refresh token。授權檢查必須在業務邏輯執行之前進行，使用 Spring Security 註解（`@PreAuthorize`、`@RequiresPermissions`）或 AOP 攔截器。
+
+**理由**：深度防禦可最小化攻擊面。多層安全確保即使一層被攻破，其他層仍提供保護。這對於管理敏感使用者資料和存取控制的系統至關重要。
+
+**執行方式**：
+
+- 所有 API 端點都必須要求認證（明確標記為公開的端點除外）
+- 權限檢查必須使用基於註解或 AOP 的授權
+- 敏感資料（密碼、token）必須在靜態儲存和傳輸時加密
+- 每次發布前必須進行安全稽核
+
+### IV. 所有關鍵操作的稽核軌跡
+
+所有修改使用者資料、角色、權限或租戶設定的操作都必須產生稽核日誌項目。稽核日誌必須記錄：租戶 ID、使用者 ID、操作類型、受影響資源、時間戳記、IP 位址，以及更新的前後狀態。稽核日誌必須是不可變的（僅附加）並儲存在專用的稽核架構或服務中。
+
+**理由**：法規合規性（GDPR、SOC 2、HIPAA）和事件調查需要完整的稽核軌跡。不可變日誌確保鑑識完整性。此原則對企業 SaaS 系統而言是不可妥協的。
+
+**執行方式**：
+
+- 使用 Spring AOP 或事件監聽器自動產生稽核日誌
+- 稽核日誌寫入不得阻塞關鍵操作（使用非同步處理）
+- 稽核日誌必須可按租戶、使用者、資源和時間範圍查詢
+- 稽核日誌保留政策必須符合法律要求
+
+### V. 關鍵路徑的測試驅動開發
+
+對於以下功能，必須先撰寫測試再實作：認證流程、授權檢查、租戶隔離邏輯和資料權限過濾。測試必須先失敗，然後在實作後通過（紅-綠-重構）。業務邏輯層的單元測試覆蓋率必須超過 70%。整合測試必須驗證跨模組互動和租戶隔離。
+
+**理由**：RBAC 系統是信任關鍵基礎設施。認證或授權中的錯誤可能導致安全漏洞。TDD 確保需求可測試，並迫使開發人員預先考慮邊界情況。高測試覆蓋率在重構時提供信心。
+
+**執行方式**：
+
+- Pull request 必須包含新功能的測試
+- CI/CD 流程必須強制執行 70% 程式碼覆蓋率門檻
+- 安全關鍵程式碼路徑必須有專門的整合測試
+- 測試必須能夠在隔離環境中執行，不依賴外部依賴（使用 mock/stub）
+
+### VI. API 優先設計與版本控制
+
+所有 API 都必須遵循 RESTful 慣例，並在實作前使用 OpenAPI/Swagger 進行文件化。API 合約必須使用 URL 路徑版本控制（`/api/v1/`、`/api/v2/`）。破壞性變更必須增加主要版本。向後相容的變更（新增可選欄位）則增加次要版本。API 回應必須使用標準化格式與一致的錯誤代碼。
+
+**理由**：清晰的 API 合約使前端和後端團隊能夠並行工作。版本控制防止在演進過程中破壞現有客戶端。標準化回應簡化客戶端錯誤處理和除錯。
+
+**執行方式**：
+
+- API 文件必須從程式碼註解生成（Swagger/SpringDoc）
+- API 變更必須審查向後相容性
+- 已棄用的 API 必須至少維護一個主要版本週期
+- API 回應格式必須包含：`code`、`message`、`data`、`timestamp`
+
+## 安全性與合規要求
+
+### 資料保護
+
+- 所有密碼必須使用 BCrypt 雜湊，最少 10 輪
+- 敏感欄位（電子郵件、電話、個人資料）必須使用 AES-256 加密儲存
+- 傳輸中的資料必須使用 TLS 1.2 或更高版本
+- 資料庫憑證必須儲存在安全保管庫中（不得存放在程式碼或設定檔中）
+
+### 存取控制
+
+- 實作最小權限原則：授予所需的最低權限
+- 支援角色階層：子角色繼承父角色權限
+- 資料範圍權限必須支援：ALL（全部）、TENANT（租戶）、DEPT（部門）、DEPT_AND_CHILD（部門及子部門）、SELF（自己）、CUSTOM（自訂）
+- 權限變更必須立即生效，無需使用者重新登入
+
+### 合規性
+
+- 支援 GDPR 刪除權（使用者資料刪除）
+- 支援合規請求的資料匯出
+- 稽核日誌最少保留 1 年（可根據法規設定）
+- 實作多區域部署的資料駐留控制
+
+## 品質標準
+
+### 程式碼品質
+
+- 遵循 SOLID 原則（記錄於 `04-低耦合設計指南.md`）
+- 使用有意義的變數和方法名稱（中文或英文，但在模組內保持一致）
+- 所有 Java 類別必須包含 Javadoc 類別註解，並標註作者：`@author CHANG SHOU-WEN`
+- 方法長度上限：50 行（不含註解）
+- 類別長度上限：500 行
+- 避免程式碼重複：將共用邏輯提取到工具類或基底類別
+
+### 效能
+
+- API 回應時間 p95（第 95 百分位數）必須 < 200ms
+- 資料庫查詢必須對 tenant_id 和常用過濾欄位使用索引
+- 快取常存取的資料（使用者權限、角色對應）TTL 為 30 分鐘
+- 所有清單 API 實作分頁（預設頁面大小：10，最大：100）
+
+### 文件
+
+- 所有公開 API 必須有 Swagger/OpenAPI 文件
+- 複雜的業務邏輯必須包含說明「為什麼」的內嵌註解，而非只是「做什麼」
+- 架構決策必須記錄在 `docs/` 目錄中
+- 資料庫架構變更必須使用遷移腳本追蹤
+
+## 治理
+
+### 憲章權威
+
+本憲章優先於所有其他開發實務和指南。當本憲章與其他文件發生衝突時，以憲章為準。對本憲章提出的變更必須經技術負責人審查，並記錄理由。
+
+### 修訂流程
+
+1. 提出修訂建議，附上清楚的理由和影響分析
+2. 與技術負責人和相關利害關係人審查
+3. 遵循語意化版本控制更新憲章版本：
+   - MAJOR（主要）：原則移除或重新定義（破壞性變更）
+   - MINOR（次要）：新增原則或擴充指南
+   - PATCH（修補）：釐清或修正錯字
+4. 在同步影響報告中記錄變更（本檔案頂部）
+5. 在 1 個衝刺週期內更新相依的模板和文件
+
+### 合規驗證
+
+- 所有 pull request 必須包含憲章合規檢查清單
+- 程式碼審查必須驗證是否遵守核心原則
+- 每季架構審查必須評估系統合規性
+- 違規情況必須書面說明理由並經技術負責人批准
+
+### 執行指南
+
+對於擴充這些原則但不變更核心要求的日常開發指南,請參考:
+
+- [低耦合設計指南](../../docs/04-低耦合設計指南.md)
+- [RBAC 模型設計](../../docs/03-RBAC模型設計.md)
+- [多租戶隔離策略](../../docs/02-多租戶隔離策略.md)
+- [JWT 與權限管理最佳實踐](../../docs/07-JWT與權限管理最佳實踐.md)
+
+**版本**:1.0.0 | **批准日期**:2025-11-24 | **最後修訂**:2025-11-24
+=======
+同步影響報告 (Sync Impact Report):
+- 版本變更: N/A → 1.0.0
+- 修改原則列表: N/A（初始填充）
+- 新增章節: 全部章節已填充
+- 移除章節: 無
+- 需更新模板: ⚠ 待處理 (.specify/templates/plan-template.md, .specify/templates/spec-template.md, .specify/templates/tasks-template.md)
+- 後續待辦事項: 無
+-->
+
+# RBAC 系統專案憲章
+
+## 核心原則
+
+### 一、分層架構（嚴格遵守）
+
+必須嚴格遵守 Controller → Service → Repository → Entity 的分層結構。禁止任何捷徑或從 Controller 直接存取資料庫。此原則確保關注點分離、可測試性，以及企業級 RBAC 系統的可維護性。
+
+**理由**：分層架構是企業級應用的基石，違反此原則將導致系統難以測試、維護和擴展。
+
+### 二、無狀態認證
+
+實作基於 JWT 的認證機制，搭配 Redis 黑名單機制。必須使用 SessionCreationPolicy.STATELESS，並透過 Authorization header 傳遞 Token。此設計提供分散式部署的可擴展性與安全性。
+
+**理由**：無狀態設計是微服務架構的必要條件，確保系統可水平擴展並支援高併發場景。
+
+### 三、資料權限控制（不可妥協）
+
+必須實作 @DataPermission 註解，搭配 AOP 進行動態資料範圍控制。必須支援 DataScopeEnum：全部資料、本部門及子部門、本部門、本人。此為多租戶資料隔離與合規性的強制要求。
+
+**理由**：資料權限控制是 RBAC 系統的核心功能，缺失將導致嚴重的資料洩漏與合規問題。
+
+### 四、安全優先
+
+必須強制實施以下安全措施：使用 Bucket4j + Redis 進行限流、驗證碼驗證、Token 黑名單機制、BCrypt 密碼加密。嚴禁明文儲存密碼與 SQL 注入風險。RBAC 系統不容任何安全漏洞。
+
+**理由**：安全是認證授權系統的生命線，任何安全漏洞都可能造成災難性後果。
+
+### 五、程式碼品質與測試
+
+所有 public 方法必須有 Javadoc 文件、單元測試覆蓋率必須 >80%、必須使用 SLF4J 日誌、必須統一處理異常。必須遵循命名規範（Entity 使用 Sys 前綴、Service 介面使用 I 前綴）。此原則確保高品質、可維護的程式碼。
+
+**理由**：高品質程式碼是專案長期成功的基礎，測試覆蓋率確保系統穩定性。
+
+### 六、API 設計規範
+
+必須採用 RESTful 風格、統一回應格式（包含 code、message、data、timestamp、traceId）、使用正確的 HTTP 狀態碼。API 文檔必須使用 SpringDoc OpenAPI 自動生成。
+
+**理由**：統一的 API 設計降低前後端整合成本，提升開發效率。
+
+### 七、前端整合標準
+
+前端必須透過攔截器自動添加 Authorization header、處理 401/403 錯誤、實作 Token 刷新機制。後端必須配置 CORS、支援 Vue Router 動態權限控制。
+
+**理由**：標準化的前後端整合流程確保系統安全性與使用者體驗。
+
+## 技術棧與要求
+
+### 技術棧
+
+- Spring Boot 3.5.3
+- Spring Security 6.3+
+- PostgreSQL 15+、Redis 7+
+- JWT (JJWT 0.12+)、Bucket4j、Hutool 5.8+
+- JPA、AOP、Maven 3.9+、Lombok
+
+### 效能標準
+
+- API 響應時間 P95 < 200ms
+- 支援並發 10,000+ 使用者
+- Token 驗證時間 < 10ms
+- Redis 可用性 99.9%
+
+### 安全要求
+
+- 禁止明文儲存密碼
+- 防範 SQL 注入（使用參數化查詢）
+- 禁止硬編碼敏感資訊（必須使用 application.yml）
+- 禁止空 catch 或吞噬異常
+- 強制實施 API 限流
+- 所有 API 必須有權限控制
+- 敏感操作必須記錄於系統日誌表
+- Token 過期必須正確處理（401 + 重新登入）
+- 密碼修改後舊 Token 必須失效
+- 登出後 Token 必須加入黑名單
+
+## 開發工作流程
+
+### 命名規範
+
+- Entity：Sys 前綴（例：SysUser）
+- DTO：Request/Response 後綴（例：LoginRequest）
+- Service 介面：I 前綴（例：IAuthService）
+- Service 實作：Impl 後綴（例：AuthServiceImpl）
+- Controller：Controller 後綴（例：AuthController）
+
+### 品質門檻
+
+- 所有 public 方法必須有 Javadoc
+- 單元測試覆蓋率 > 80%
+- 必須使用 SLF4J 日誌
+- 完整異常處理，不可吞噬異常
+- 標示作者與開發時間：@author CHANG SHOU-WEN, AI-Enhanced; @since YYYY/MM/DD
+
+### 錯誤處理
+
+- 必須使用 @ControllerAdvice 統一處理異常
+- 統一回應格式：{code, message, data, timestamp, traceId}
+- 使用 SLF4J 記錄異常詳情，包括堆疊追蹤
+- 敏感資訊（如密碼）不可記錄於日誌
+- 生產環境必須啟用結構化日誌
+
+### 前端整合
+
+- 必須使用 SpringDoc OpenAPI (Swagger 3) 生成 API 文檔
+- 端點：/swagger-ui.html (UI) 和 /v3/api-docs (JSON)
+- 必須配置 JWT Bearer Token 認證
+- 必須配置 CORS，允許前端域名跨域請求
+- 前端必須實作請求攔截器（自動添加 Authorization header）
+- 前端必須實作響應攔截器（處理 401/403）
+- 必須使用 Vue Router 守衛檢查 Token
+
+## 治理規範
+
+本憲章優先於所有其他實踐規範。任何修訂必須經過文件記錄、團隊審查，並根據語義化版本規則進行版本升級。所有變更必須進行合規性審查。
+
+詳細實作指引請參考 `docs/spec/constitution_detail.md`。
+
+### 版本控制規則
+
+- **MAJOR（主版本）**：向後不相容的治理或原則移除/重新定義
+- **MINOR（次版本）**：新增原則/章節或重大擴展
+- **PATCH（修訂版本）**：澄清、措辭、錯字修正、非語義精煉
+
+### 修訂程序
+
+1. 提出修訂提案，說明理由與影響範圍
+2. 團隊審查與討論
+3. 更新憲章文件與相關模板
+4. 版本號升級並記錄於同步影響報告
+5. 通知所有團隊成員並進行培訓
+
+### 合規性審查
+
+- 所有 Pull Request 必須驗證憲章合規性
+- 複雜度必須有充分理由
+- 定期（每季）進行憲章合規性稽核
+
+**版本**: 1.0.0 | **批准日期**: 2025-11-13 | **最後修訂**: 2025-11-13
+>>>>>>> 2114bcd016510959a49c09e342cc7e1f7771287c
