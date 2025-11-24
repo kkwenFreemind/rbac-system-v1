@@ -23,6 +23,11 @@ public class Result<T> {
     private int code;
 
     /**
+     * Error code string (for detailed error classification).
+     */
+    private String errorCode;
+
+    /**
      * Response message describing the result.
      */
     private String message;
@@ -51,6 +56,15 @@ public class Result<T> {
      */
     public int getCode() {
         return code;
+    }
+
+    /**
+     * Get the error code string.
+     *
+     * @return the error code string
+     */
+    public String getErrorCode() {
+        return errorCode;
     }
 
     /**
@@ -97,12 +111,14 @@ public class Result<T> {
      * Private constructor with all fields.
      *
      * @param code the response code
+     * @param errorCode the error code string
      * @param message the response message
      * @param data the response data
      * @param traceId the trace ID
      */
-    private Result(int code, String message, T data, String traceId) {
+    private Result(int code, String errorCode, String message, T data, String traceId) {
         this.code = code;
+        this.errorCode = errorCode;
         this.message = message;
         this.data = data;
         this.timestamp = Instant.now();
@@ -119,7 +135,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> success(T data) {
-        return new Result<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data, null);
+        return new Result<>(ResultCode.SUCCESS.getCode(), null, ResultCode.SUCCESS.getMessage(), data, null);
     }
 
     /**
@@ -131,7 +147,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> success(T data, String message) {
-        return new Result<>(ResultCode.SUCCESS.getCode(), message, data, null);
+        return new Result<>(ResultCode.SUCCESS.getCode(), null, message, data, null);
     }
 
     /**
@@ -141,7 +157,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> success() {
-        return new Result<>(ResultCode.SUCCESS_NO_CONTENT.getCode(), ResultCode.SUCCESS_NO_CONTENT.getMessage(), null, null);
+        return new Result<>(ResultCode.SUCCESS_NO_CONTENT.getCode(), null, ResultCode.SUCCESS_NO_CONTENT.getMessage(), null, null);
     }
 
     /**
@@ -152,7 +168,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> success(String message) {
-        return new Result<>(ResultCode.SUCCESS.getCode(), message, null, null);
+        return new Result<>(ResultCode.SUCCESS.getCode(), null, message, null, null);
     }
 
     // ==================== Error Factory Methods ====================
@@ -165,7 +181,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> error(ResultCode resultCode) {
-        return new Result<>(resultCode.getCode(), resultCode.getMessage(), null, null);
+        return new Result<>(resultCode.getCode(), null, resultCode.getMessage(), null, null);
     }
 
     /**
@@ -177,7 +193,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> error(ResultCode resultCode, String customMessage) {
-        return new Result<>(resultCode.getCode(), customMessage, null, null);
+        return new Result<>(resultCode.getCode(), null, customMessage, null, null);
     }
 
     /**
@@ -189,7 +205,7 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> error(int code, String message) {
-        return new Result<>(code, message, null, null);
+        return new Result<>(code, null, message, null, null);
     }
 
     /**
@@ -201,7 +217,20 @@ public class Result<T> {
      * @return Result instance
      */
     public static <T> Result<T> error(String code, String message) {
-        return new Result<>(Integer.parseInt(code), message, null, null);
+        return new Result<>(Integer.parseInt(code), code, message, null, null);
+    }
+
+    /**
+     * Create an error result with code, error code string, and message.
+     *
+     * @param code the HTTP status code
+     * @param errorCode the error code string
+     * @param message the error message
+     * @param <T> the type of data
+     * @return Result instance
+     */
+    public static <T> Result<T> error(int code, String errorCode, String message) {
+        return new Result<>(code, errorCode, message, null, null);
     }
 
     /**

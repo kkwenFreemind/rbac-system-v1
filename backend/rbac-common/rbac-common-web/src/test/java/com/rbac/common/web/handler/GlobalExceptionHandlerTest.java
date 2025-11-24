@@ -30,8 +30,8 @@ class GlobalExceptionHandlerTest {
     void handleRbacException_ShouldReturnErrorResult() throws Exception {
         mockMvc.perform(get("/test/rbac-exception")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(ResultCode.USER_NOT_FOUND.getCode()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("BUSINESS_ERROR"))
                 .andExpect(jsonPath("$.message").value("User not found"));
     }
 
@@ -39,8 +39,8 @@ class GlobalExceptionHandlerTest {
     void handleException_ShouldReturnInternalServerError() throws Exception {
         mockMvc.perform(get("/test/exception")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(ResultCode.INTERNAL_SERVER_ERROR.getCode()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.message").value("Unexpected error"));
     }
 
@@ -48,7 +48,7 @@ class GlobalExceptionHandlerTest {
     static class TestController {
         @GetMapping("/test/rbac-exception")
         public void throwRbacException() {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND.getCode(), "User not found");
+            throw new BusinessException("BUSINESS_ERROR", "User not found");
         }
 
         @GetMapping("/test/exception")

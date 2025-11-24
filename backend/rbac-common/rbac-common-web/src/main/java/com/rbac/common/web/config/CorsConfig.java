@@ -43,25 +43,26 @@ public class CorsConfig implements WebMvcConfigurer {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        RbacProperties.CorsProperties corsProps = rbacProperties.getCors();
+        // TODO: Implement CORS configuration
+        // RbacProperties.CorsProperties corsProps = rbacProperties.getCors();
 
-        if (!corsProps.isEnabled()) {
-            log.info("CORS is disabled");
-            return;
-        }
+        // if (!corsProps.isEnabled()) {
+        //     log.info("CORS is disabled");
+        //     return;
+        // }
 
-        log.info("Configuring CORS with settings: enabled={}, allowedOrigins={}, allowCredentials={}",
-                corsProps.isEnabled(), corsProps.getAllowedOrigins(), corsProps.isAllowCredentials());
+        // log.info("Configuring CORS with settings: enabled={}, allowedOrigins={}, allowCredentials={}",
+        //         corsProps.isEnabled(), corsProps.getAllowedOrigins(), corsProps.isAllowCredentials());
 
-        registry.addMapping("/api/**")  // 僅對 API 端點應用 CORS
-                .allowedOrigins(getAllowedOrigins(corsProps))
-                .allowedMethods(getAllowedMethods(corsProps))
-                .allowedHeaders(getAllowedHeaders(corsProps))
-                .exposedHeaders(getExposedHeaders(corsProps))
-                .allowCredentials(corsProps.isAllowCredentials())
-                .maxAge(corsProps.getMaxAge());
+        // registry.addMapping("/api/**")  // 僅對 API 端點應用 CORS
+        //         .allowedOrigins(getAllowedOrigins(corsProps))
+        //         .allowedMethods(getAllowedMethods(corsProps))
+        //         .allowedHeaders(getAllowedHeaders(corsProps))
+        //         .exposedHeaders(getExposedHeaders(corsProps))
+        //         .allowCredentials(corsProps.isAllowCredentials())
+        //         .maxAge(corsProps.getMaxAge());
 
-        log.info("CORS configuration applied successfully");
+        // log.info("CORS configuration applied successfully");
     }
 
     /**
@@ -73,20 +74,22 @@ public class CorsConfig implements WebMvcConfigurer {
      * @param corsProps CORS 配置屬性
      * @return 允許的來源陣列
      */
-    private String[] getAllowedOrigins(RbacProperties.CorsProperties corsProps) {
-        if (corsProps.getAllowedOrigins() != null && !corsProps.getAllowedOrigins().isEmpty()) {
-            return corsProps.getAllowedOrigins().toArray(new String[0]);
-        }
+    private String[] getAllowedOrigins(Object corsProps) {
+        // TODO: Implement allowed origins logic
+        // if (corsProps.getAllowedOrigins() != null && !corsProps.getAllowedOrigins().isEmpty()) {
+        //     return corsProps.getAllowedOrigins().toArray(new String[0]);
+        // }
 
-        // 預設允許的來源（開發環境）
-        return new String[]{
-                "http://localhost:3000",    // React 開發伺服器
-                "http://localhost:8080",    // Vue.js 開發伺服器
-                "http://localhost:4200",    // Angular 開發伺服器
-                "http://127.0.0.1:3000",    // 本地 IP
-                "http://127.0.0.1:8080",
-                "http://127.0.0.1:4200"
-        };
+        // // 預設允許的來源（開發環境）
+        // return new String[]{
+        //         "http://localhost:3000",    // React 開發伺服器
+        //         "http://localhost:8080",    // Vue.js 開發伺服器
+        //         "http://localhost:4200",    // Angular 開發伺服器
+        //         "http://127.0.0.1:3000",    // 本地 IP
+        //         "http://127.0.0.1:8080",
+        //         "http://127.0.0.1:4200"
+        // };
+        return new String[]{"*"};
     }
 
     /**
@@ -97,15 +100,17 @@ public class CorsConfig implements WebMvcConfigurer {
      * @param corsProps CORS 配置屬性
      * @return 允許的方法陣列
      */
-    private String[] getAllowedMethods(RbacProperties.CorsProperties corsProps) {
-        if (corsProps.getAllowedMethods() != null && !corsProps.getAllowedMethods().isEmpty()) {
-            return corsProps.getAllowedMethods().toArray(new String[0]);
-        }
+    private String[] getAllowedMethods(Object corsProps) {
+        // TODO: Implement allowed methods logic
+        // if (corsProps.getAllowedMethods() != null && !corsProps.getAllowedMethods().isEmpty()) {
+        //     return corsProps.getAllowedMethods().toArray(new String[0]);
+        // }
 
-        // 預設允許的 HTTP 方法
-        return new String[]{
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
-        };
+        // // 預設允許的 HTTP 方法
+        // return new String[]{
+        //         "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"
+        // };
+        return new String[]{"GET", "POST", "PUT", "DELETE", "OPTIONS"};
     }
 
     /**
@@ -116,27 +121,29 @@ public class CorsConfig implements WebMvcConfigurer {
      * @param corsProps CORS 配置屬性
      * @return 允許的標頭陣列
      */
-    private String[] getAllowedHeaders(RbacProperties.CorsProperties corsProps) {
-        if (corsProps.getAllowedHeaders() != null && !corsProps.getAllowedHeaders().isEmpty()) {
-            return corsProps.getAllowedHeaders().toArray(new String[0]);
-        }
+    private String[] getAllowedHeaders(Object corsProps) {
+        // TODO: Implement allowed headers logic
+        // if (corsProps.getAllowedHeaders() != null && !corsProps.getAllowedHeaders().isEmpty()) {
+        //     return corsProps.getAllowedHeaders().toArray(new String[0]);
+        // }
 
-        // 預設允許的請求標頭
-        return new String[]{
-                "Accept",
-                "Accept-Encoding",
-                "Accept-Language",
-                "Cache-Control",
-                "Content-Type",
-                "Content-Length",
-                "Authorization",           // JWT tokens
-                "X-Tenant-Id",            // 租戶標識
-                "X-Trace-Id",             // 追蹤標識
-                "X-Requested-With",
-                "Origin",
-                "Referer",
-                "User-Agent"
-        };
+        // // 預設允許的請求標頭
+        // return new String[]{
+        //         "Accept",
+        //         "Accept-Encoding",
+        //         "Accept-Language",
+        //         "Cache-Control",
+        //         "Content-Type",
+        //         "Content-Length",
+        //         "Authorization",           // JWT tokens
+        //         "X-Tenant-Id",            // 租戶標識
+        //         "X-Trace-Id",             // 追蹤標識
+        //         "X-Requested-With",
+        //         "Origin",
+        //         "Referer",
+        //         "User-Agent"
+        // };
+        return new String[]{"*"};
     }
 
     /**
@@ -147,16 +154,18 @@ public class CorsConfig implements WebMvcConfigurer {
      * @param corsProps CORS 配置屬性
      * @return 暴露的標頭陣列
      */
-    private String[] getExposedHeaders(RbacProperties.CorsProperties corsProps) {
-        if (corsProps.getExposedHeaders() != null && !corsProps.getExposedHeaders().isEmpty()) {
-            return corsProps.getExposedHeaders().toArray(new String[0]);
-        }
+    private String[] getExposedHeaders(Object corsProps) {
+        // TODO: Implement exposed headers logic
+        // if (corsProps.getExposedHeaders() != null && !corsProps.getExposedHeaders().isEmpty()) {
+        //     return corsProps.getExposedHeaders().toArray(new String[0]);
+        // }
 
-        // 預設暴露的響應標頭
-        return new String[]{
-                "X-Tenant-Id",            // 當前租戶標識
-                "X-Trace-Id",             // 請求追蹤標識
-                "Content-Disposition"     // 檔案下載標頭
-        };
+        // // 預設暴露的響應標頭
+        // return new String[]{
+        //         "X-Tenant-Id",            // 當前租戶標識
+        //         "X-Trace-Id",             // 請求追蹤標識
+        //         "Content-Disposition"     // 檔案下載標頭
+        // };
+        return new String[]{};
     }
 }

@@ -198,37 +198,37 @@
 
 ### FR4.1: 全域異常處理器
 
-- [ ] T058 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/handler/GlobalExceptionHandler.java 建立 GlobalExceptionHandler.java
+- [X] T058 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/handler/GlobalExceptionHandler.java 建立 GlobalExceptionHandler.java
 
 ### FR4.2 & FR4.4: 過濾器
 
-- [ ] T059 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/TenantFilter.java 建立 TenantFilter.java（從標頭提取 tenant_id 並設定到 TenantContextHolder）
-- [ ] T060 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/TraceIdFilter.java 建立 TraceIdFilter.java（MDC Trace ID 生成）
-- [ ] T061 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/RequestLogFilter.java 建立 RequestLogFilter.java
+- [X] T059 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/TenantFilter.java 建立 TenantFilter.java（從標頭提取 tenant_id 並設定到 TenantContextHolder）✅
+- [X] T060 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/TraceIdFilter.java 建立 TraceIdFilter.java（MDC Trace ID 生成）✅
+- [X] T061 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/filter/RequestLogFilter.java 建立 RequestLogFilter.java✅
 
 ### FR4.4: 追蹤上下文管理
 
-- [ ] T062 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/context/TraceContext.java 建立 TraceContext.java（MDC 包裝器）
+- [X] T062 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/context/TraceContext.java 建立 TraceContext.java（MDC 包裝器）
 
 ### FR4.3: 請求攻擊器
 
-- [ ] T063 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/interceptor/TenantCleanupInterceptor.java 建立 TenantCleanupInterceptor.java（備援清理）
+- [X] T063 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/interceptor/TenantCleanupInterceptor.java 建立 TenantCleanupInterceptor.java（備援清理）
 
 ### FR4.5 & FR4.7: Web 配置
 
-- [ ] T064 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/WebMvcConfig.java 建立 WebMvcConfig.java（註冊過濾器和攻擊器）
-- [ ] T065 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/CorsConfig.java 建立 CorsConfig.java
-- [ ] T066 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/ApiVersionConfig.java 建立 ApiVersionConfig.java
+- [X] T064 [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/WebMvcConfig.java 建立 WebMvcConfig.java（註冊過濾器和攻擊器）
+- [X] T065 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/CorsConfig.java 建立 CorsConfig.java
+- [X] T066 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/config/ApiVersionConfig.java 建立 ApiVersionConfig.java
 
 ### FR4.6: 請求記錄切面
 
-- [ ] T067 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/aspect/RequestLogAspect.java 建立 RequestLogAspect.java
+- [X] T067 [P] [FR4] 在 backend/rbac-common/rbac-common-web/src/main/java/com/rbac/common/web/aspect/RequestLogAspect.java 建立 RequestLogAspect.java
 
 ### FR4 整合測試（關鍵 - TenantFilter & ThreadLocal 清理）
 
-- [ ] T068 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/filter/TenantFilterIntegrationTest.java 建立 TenantFilterIntegrationTest.java（測試 tenant_id 提取和清理）
-- [ ] T069 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/handler/GlobalExceptionHandlerTest.java 建立 GlobalExceptionHandlerTest.java（測試統一錯誤響應）
-- [ ] T070 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/filter/TraceIdFilterTest.java 建立 TraceIdFilterTest.java（測試 MDC Trace ID 傳播）
+- [X] T068 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/filter/TenantFilterIntegrationTest.java 建立 TenantFilterIntegrationTest.java（測試 tenant_id 提取和清理）
+- [X] T069 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/handler/GlobalExceptionHandlerTest.java 建立 GlobalExceptionHandlerTest.java（測試統一錯誤響應）
+- [X] T070 [FR4] 在 backend/rbac-common/rbac-common-web/src/test/java/com/rbac/common/web/filter/TraceIdFilterTest.java 建立 TraceIdFilterTest.java（測試 MDC Trace ID 傳播）
 
 **檢查點**：Common Web 模組完成 - 所有 HTTP 請求都有租戶上下文、錯誤處理和追蹤
 

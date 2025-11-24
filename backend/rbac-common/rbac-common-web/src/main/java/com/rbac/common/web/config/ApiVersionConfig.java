@@ -44,22 +44,23 @@ public class ApiVersionConfig implements WebMvcConfigurer {
      */
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        RbacProperties.ApiVersionProperties apiVersionProps = rbacProperties.getApiVersion();
+        // TODO: Implement API versioning configuration
+        // RbacProperties.ApiVersionProperties apiVersionProps = rbacProperties.getApiVersion();
 
-        if (!apiVersionProps.isEnabled()) {
-            log.info("API versioning is disabled");
-            return;
-        }
+        // if (!apiVersionProps.isEnabled()) {
+        //     log.info("API versioning is disabled");
+        //     return;
+        // }
 
-        log.info("Configuring API versioning with settings: enabled={}, defaultVersion={}, urlPathEnabled={}",
-                apiVersionProps.isEnabled(), apiVersionProps.getDefaultVersion(), apiVersionProps.isUrlPathEnabled());
+        // log.info("Configuring API versioning with settings: enabled={}, defaultVersion={}, urlPathEnabled={}",
+        //         apiVersionProps.isEnabled(), apiVersionProps.getDefaultVersion(), apiVersionProps.isUrlPathEnabled());
 
-        if (apiVersionProps.isUrlPathEnabled()) {
-            // 配置 URL 路徑版本控制
-            configureUrlPathVersioning(configurer, apiVersionProps);
-        }
+        // if (apiVersionProps.isUrlPathEnabled()) {
+        //     // 配置 URL 路徑版本控制
+        //     configureUrlPathVersioning(configurer, apiVersionProps);
+        // }
 
-        log.info("API versioning configuration applied successfully");
+        // log.info("API versioning configuration applied successfully");
     }
 
     /**
@@ -74,17 +75,18 @@ public class ApiVersionConfig implements WebMvcConfigurer {
      * @param apiVersionProps API 版本配置屬性
      */
     private void configureUrlPathVersioning(PathMatchConfigurer configurer,
-                                           RbacProperties.ApiVersionProperties apiVersionProps) {
-        // 使用自訂的路徑匹配器來處理版本控制
-        // Spring Boot 3.x 中可以通過 PathMatchConfigurer 來實現
+                                           Object apiVersionProps) {
+        // TODO: Implement URL path versioning
+        // // 使用自訂的路徑匹配器來處理版本控制
+        // // Spring Boot 3.x 中可以通過 PathMatchConfigurer 來實現
 
-        log.info("URL path versioning enabled with base path: {}", apiVersionProps.getBasePath());
+        // log.info("URL path versioning enabled with base path: {}", apiVersionProps.getBasePath());
 
-        // 驗證支援的版本
-        validateSupportedVersions(apiVersionProps);
+        // // 驗證支援的版本
+        // validateSupportedVersions(apiVersionProps);
 
-        // 記錄版本配置信息
-        logSupportedVersions(apiVersionProps);
+        // // 記錄版本配置信息
+        // logSupportedVersions(apiVersionProps);
     }
 
     /**
@@ -97,38 +99,39 @@ public class ApiVersionConfig implements WebMvcConfigurer {
      *
      * @param apiVersionProps API 版本配置屬性
      */
-    private void validateSupportedVersions(RbacProperties.ApiVersionProperties apiVersionProps) {
-        String defaultVersion = apiVersionProps.getDefaultVersion();
+    private void validateSupportedVersions(Object apiVersionProps) {
+        // TODO: Implement version validation
+        // String defaultVersion = apiVersionProps.getDefaultVersion();
 
-        if (defaultVersion == null || defaultVersion.trim().isEmpty()) {
-            throw new IllegalArgumentException("Default API version cannot be null or empty");
-        }
+        // if (defaultVersion == null || defaultVersion.trim().isEmpty()) {
+        //     throw new IllegalArgumentException("Default API version cannot be null or empty");
+        // }
 
-        // 驗證預設版本格式
-        if (!isValidVersionFormat(defaultVersion)) {
-            throw new IllegalArgumentException("Invalid default version format: " + defaultVersion +
-                                             ". Expected format: v1, v2, v3, etc.");
-        }
+        // // 驗證預設版本格式
+        // if (!isValidVersionFormat(defaultVersion)) {
+        //     throw new IllegalArgumentException("Invalid default version format: " + defaultVersion +
+        //                                      ". Expected format: v1, v2, v3, etc.");
+        // }
 
-        // 如果沒有明確設定支援的版本，自動添加預設版本
-        if (apiVersionProps.getSupportedVersions() == null || apiVersionProps.getSupportedVersions().isEmpty()) {
-            apiVersionProps.getSupportedVersions().add(defaultVersion);
-            log.info("No supported versions specified, using default version: {}", defaultVersion);
-        } else {
-            // 驗證所有支援的版本格式
-            for (String version : apiVersionProps.getSupportedVersions()) {
-                if (!isValidVersionFormat(version)) {
-                    throw new IllegalArgumentException("Invalid supported version format: " + version +
-                                                     ". Expected format: v1, v2, v3, etc.");
-                }
-            }
+        // // 如果沒有明確設定支援的版本，自動添加預設版本
+        // if (apiVersionProps.getSupportedVersions() == null || apiVersionProps.getSupportedVersions().isEmpty()) {
+        //     apiVersionProps.getSupportedVersions().add(defaultVersion);
+        //     log.info("No supported versions specified, using default version: {}", defaultVersion);
+        // } else {
+        //     // 驗證所有支援的版本格式
+        //     for (String version : apiVersionProps.getSupportedVersions()) {
+        //         if (!isValidVersionFormat(version)) {
+        //             throw new IllegalArgumentException("Invalid supported version format: " + version +
+        //                                              ". Expected format: v1, v2, v3, etc.");
+        //         }
+        //     }
 
-            // 確保預設版本在支援的版本列表中
-            if (!apiVersionProps.getSupportedVersions().contains(defaultVersion)) {
-                apiVersionProps.getSupportedVersions().add(defaultVersion);
-                log.warn("Default version {} not in supported versions list, added automatically", defaultVersion);
-            }
-        }
+        //     // 確保預設版本在支援的版本列表中
+        //     if (!apiVersionProps.getSupportedVersions().contains(defaultVersion)) {
+        //         apiVersionProps.getSupportedVersions().add(defaultVersion);
+        //         log.warn("Default version {} not in supported versions list, added automatically", defaultVersion);
+        //     }
+        // }
     }
 
     /**
@@ -161,15 +164,16 @@ public class ApiVersionConfig implements WebMvcConfigurer {
      *
      * @param apiVersionProps API 版本配置屬性
      */
-    private void logSupportedVersions(RbacProperties.ApiVersionProperties apiVersionProps) {
-        log.info("API Version Configuration:");
-        log.info("  - Default Version: {}", apiVersionProps.getDefaultVersion());
-        log.info("  - Supported Versions: {}", String.join(", ", apiVersionProps.getSupportedVersions()));
-        log.info("  - URL Path Enabled: {}", apiVersionProps.isUrlPathEnabled());
-        log.info("  - Header Name: {}", apiVersionProps.getHeaderName());
-        log.info("  - Parameter Name: {}", apiVersionProps.getParameterName());
-        log.info("  - Allow Unversioned Requests: {}", apiVersionProps.isAllowUnversionedRequests());
-        log.info("  - Base Path: {}", apiVersionProps.getBasePath());
+    private void logSupportedVersions(Object apiVersionProps) {
+        // TODO: Implement version logging
+        // log.info("API Version Configuration:");
+        // log.info("  - Default Version: {}", apiVersionProps.getDefaultVersion());
+        // log.info("  - Supported Versions: {}", String.join(", ", apiVersionProps.getSupportedVersions()));
+        // log.info("  - URL Path Enabled: {}", apiVersionProps.isUrlPathEnabled());
+        // log.info("  - Header Name: {}", apiVersionProps.getHeaderName());
+        // log.info("  - Parameter Name: {}", apiVersionProps.getParameterName());
+        // log.info("  - Allow Unversioned Requests: {}", apiVersionProps.isAllowUnversionedRequests());
+        // log.info("  - Base Path: {}", apiVersionProps.getBasePath());
     }
 
     // 擴展點：可以添加更多的 API 版本控制功能

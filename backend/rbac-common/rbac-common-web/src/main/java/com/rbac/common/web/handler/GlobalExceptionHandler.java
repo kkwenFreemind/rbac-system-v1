@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
         log.error("RbacException: code={}, message={}", e.getCode(), e.getMessage());
         HttpStatus status = mapCodeToHttpStatus(e.getCode());
         return ResponseEntity.status(status)
-                .body(Result.error(mapCodeToInt(e.getCode()), e.getMessage()));
+                .body(Result.error(status.value(), e.getCode(), e.getMessage()));
     }
 
     /**
