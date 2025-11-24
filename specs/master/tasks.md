@@ -234,26 +234,26 @@
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 7: 完善與橫切關注點
 
-**Purpose**: Documentation, validation, and final improvements
+**Purpose**: 文檔、驗證和最終改進
 
-- [ ] T071 [P] Create README.md in backend/rbac-common/ with module overview and usage examples
-- [ ] T072 [P] Create CHANGELOG.md in backend/rbac-common/ documenting initial release
-- [ ] T073 Create logback-spring.xml in backend/rbac-common/rbac-common-web/src/main/resources with MDC pattern for Trace ID
-- [ ] T074 Add Javadoc comments to all public APIs (CacheService, DistributedLock, UserContext, Result, etc.)
-- [ ] T075 Run mvn clean install to verify all modules compile successfully
-- [ ] T076 Run mvn test to ensure all unit and integration tests pass
-- [ ] T077 Verify code coverage reaches 70%+ target using JaCoCo
-- [ ] T078 Create docker-compose.yml for PostgreSQL and Redis test environment
-- [ ] T079 Validate quickstart.md instructions by following setup steps
-- [ ] T080 Code review focusing on tenant isolation enforcement and ThreadLocal cleanup
+- [ ] T071 [P] 在 backend/rbac-common/ 建立 README.md，包含模組概述和使用範例
+- [ ] T072 [P] 在 backend/rbac-common/ 建立 CHANGELOG.md，記錄初始版本
+- [ ] T073 在 backend/rbac-common/rbac-common-web/src/main/resources 建立 logback-spring.xml，包含 Trace ID 的 MDC 模式
+- [ ] T074 為所有公開 API 新增 Javadoc 註解（CacheService、DistributedLock、UserContext、Result 等）
+- [ ] T075 執行 mvn clean install 以驗證所有模組編譯成功
+- [ ] T076 執行 mvn test 以確保所有單元測試和整合測試通過
+- [ ] T077 使用 JaCoCo 驗證程式碼覆蓋率達到 70%+ 目標
+- [ ] T078 建立 docker-compose.yml 用於 PostgreSQL 和 Redis 測試環境
+- [ ] T079 按照步驟驗證 quickstart.md 說明
+- [ ] T080 程式碼審查重點關注租戶隔離強制執行和 ThreadLocal 清理
 
 ---
 
-## Dependencies & Execution Order
+## 依賴與執行順序
 
-### Phase Dependencies
+### 階段依賴
 
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup (Phase 1) completion
@@ -263,7 +263,7 @@
 - **FR4 - Common Web (Phase 6)**: Depends on FR1 + FR2 (needs Result, exceptions, TenantContextHolder)
 - **Polish (Phase 7)**: Depends on all FR phases (FR1-FR4) completion
 
-### Functional Requirement Dependencies
+### 功能需求依賴
 
 ```text
 FR1 (Common Core)
@@ -273,7 +273,7 @@ FR1 (Common Core)
   └── FR4 (Common Web)      [needs Result, exceptions, TenantContextHolder]
 ```
 
-### Critical Path
+### 關鍵路徑
 
 The fastest path to a working Common Layer:
 
@@ -285,7 +285,7 @@ The fastest path to a working Common Layer:
 6. Phase 5: FR3 Optional but recommended (T047-T057) - Can be added later if needed
 7. Phase 7: Polish (T071-T080)
 
-### Parallel Opportunities
+### 平行機會
 
 **Within Setup (Phase 1)**:
 
@@ -323,7 +323,7 @@ The fastest path to a working Common Layer:
 
 ---
 
-## Parallel Example: FR1 Common Core
+## 平行範例：FR1 Common Core
 
 ```bash
 # After Foundational phase completes, launch FR1 exception classes in parallel:
@@ -343,7 +343,7 @@ Task T029: Create ValidationUtil.java
 
 ---
 
-## Implementation Strategy
+## 實作策略
 
 ### Minimum Viable Common Layer (Phases 1-2-3-4-6)
 
@@ -387,7 +387,7 @@ With 2 developers (recommended):
 
 ---
 
-## Acceptance Criteria Validation
+## 驗收標準驗證
 
 ### AC1: Common Core ✅
 
@@ -419,7 +419,7 @@ With 2 developers (recommended):
 - [ ] @Valid validation failures return unified error format (T058)
 - [ ] CORS configuration allows frontend requests (T065)
 
-### Success Metrics
+### 成功指標
 
 - [ ] Unit test coverage > 70% (T077)
 - [ ] All Acceptance Criteria pass (T076)
@@ -428,7 +428,7 @@ With 2 developers (recommended):
 
 ---
 
-## Notes
+## 附註
 
 - **[P] tasks**: Different files, no dependencies on incomplete tasks within the same phase
 - **[FR#] label**: Maps task to functional requirement for traceability
@@ -442,7 +442,7 @@ With 2 developers (recommended):
 
 ---
 
-## Task Summary
+## 任務摘要
 
 **Total Tasks**: 80
 
@@ -454,22 +454,22 @@ With 2 developers (recommended):
 - Phase 6 (FR4 - Common Web): 13 tasks (10 implementation + 3 critical tests)
 - Phase 7 (Polish): 10 tasks
 
-**Parallel Opportunities**: 35+ tasks can be executed in parallel within their phases
+**平行機會**：35+ 個任務可在階段內平行執行
 
-**MVP Scope**: Phases 1-2-3-4-6 (60 tasks) - Sufficient for business module development
+**MVP 範圍**：Phases 1-2-3-4-6（60 個任務）- 足夠支援業務模組開發
 
-**Independent Test Criteria**:
+**獨立測試標準**：
 
 - FR1: Can create Result objects and throw custom exceptions
 - FR2: Can save entities with auto-injected tenant_id and audit fields
 - FR3: Can cache data and acquire distributed locks
 - FR4: HTTP requests have tenant context, unified error format, and trace IDs
 
-**Format Validation**: ✅ All tasks follow checklist format: `- [ ] [ID] [P?] [FR#] Description with file path`
+**格式驗證**：✅ 所有任務遵循檢查清單格式：`- [ ] [ID] [P?] [FR#] Description with file path`
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns 🧹
+## Phase 7: 完善與橫切關注點 🧹
 
 **目標**：確保程式碼品質、效能和可維護性
 
@@ -521,46 +521,5 @@ graph TD
 
 **關鍵路徑**：Phase 1 → 2 → 3 → 4 → 6 → 7（MVP 核心）
 **平行機會**：FR1、FR2、FR3 可平行開發，FR4 依賴 FR1+FR2
-
----
-
-## 實作策略
-
-### MVP 優先順序（建議）
-
-1. **Phase 1-2-3-4-6**：核心基礎設施（60 個任務）
-   - 租戶隔離、資料庫、快取、Web 層
-   - 足夠支援業務模組開發
-
-2. **Phase 5**：Redis 快取（可延後）
-   - 效能優化，非核心功能
-
-3. **Phase 7**：品質檢查和文件
-   - 最後階段確保品質
-
-### 平行執行範例
-
-**開發者 A**（資料庫專家）：
-
-- Phase 1: T001-T007
-- Phase 2: T008-T014
-- Phase 4: FR2 所有任務
-
-**開發者 B**（快取專家）：
-
-- Phase 3: FR1 所有任務
-- Phase 5: FR3 所有任務
-
-**開發者 C**（Web 專家）：
-
-- Phase 6: FR4 所有任務（在 FR1+FR2 完成後）
-
-### 關鍵檢查點
-
-- **CP1**：Phase 2 完成 - 專案結構和依賴正確
-- **CP2**：Phase 3 完成 - Result 和異常類可用
-- **CP3**：Phase 4 完成 - 租戶隔離測試通過
-- **CP4**：Phase 6 完成 - HTTP 請求有租戶上下文
-- **CP5**：Phase 7 完成 - 品質檢查通過
 
 ---
