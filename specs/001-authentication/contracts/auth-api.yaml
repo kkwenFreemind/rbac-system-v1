@@ -1,0 +1,612 @@
+openapi: 3.0.3
+info:
+  title: RBAC System - Authentication Module API
+  description: |
+    認證授權模組 API 規格文件
+
+    **功能概述**：
+    - 使用者登入（帳號密碼驗證 + JWT Token 生成）
+    - 使用者登出（Token 撤銷加入黑名單）
+    - 取得當前使用者資訊
+    
+    **認證機制**：
+    - JWT Token (HMAC-SHA256, 24 小時有效期)
+    - Authorization header: `Bearer {token}`
+    - Token 黑名單機制（Redis）
+
+    **安全特性**：
+    - BCrypt 密碼驗證（Rounds: 10）
+    - 帳號鎖定策略（5 次錯誤 → 鎖定 15 分鐘）
+    - 通用錯誤訊息（防止帳號枚舉）
+
+  version: 1.0.0
+  contact:
+    name: CHANG SHOU-WEN
+    email: dev@example.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: 本地開發環境
+  - url: https://api-dev.example.com
+    description: 開發環境
+  - url: https://api.example.com
+    description: 生產環境
+
+tags:
+  - name: Authentication
+    description: 認證相關 API
+
+paths:
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: 使用者登入
+      description: |
+        使用帳號密碼進行認證，成功後返回 JWT Token。
+        
+        **業務邏輯**：
+        1. 驗證使用者名稱格式（3-50 字元）
+        2. 檢查帳號是否鎖定（5 次錯誤 → 鎖定 15 分鐘）
+        3. 從 UserRepository 查詢使用者
+        4. BCrypt 驗證密碼
+        5. 生成 JWT Token（包含 user_id, tenant_id, username, roles）
+        6. 記錄登入日誌（user_id, tenant_id, IP, 時間戳）
+        7. 更新最後登入時間
+        
+        **錯誤處理**：
+        - 密碼錯誤累計 5 次 → 帳號鎖定 15 分鐘
+        - 鎖定期間登入 → 返回 403 Forbidden
+        - 使用者不存在 → 返回通用錯誤訊息「帳號或密碼錯誤」（防止帳號枚舉）
+
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              admin:
+                summary: 管理員登入
+                value:
+                  username: admin
+                  password: admin123
+              user:
+                summary: 一般使用者登入
+                value:
+                  username: john
+                  password: SecurePass123!
+
+      responses:
+        '200':
+          description: 登入成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+              examples:
+                success:
+                  summary: 登入成功範例
+                  value:
+                    code: 200
+                    message: 登入成功
+                    data:
+                      token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ0ZW5hbnRfaWQiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjUzNjYwMCwiZXhwIjoxNzMyNjIzMDAwLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                      tokenType: Bearer
+                      expiresIn: 86400
+                      expiresAt: 1732623000
+                      userId: 1
+                      username: admin
+                      tenantId: 1
+                      roles:
+                        - ROLE_ADMIN
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+        '400':
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation:
+                  summary: 驗證失敗
+                  value:
+                    code: 400
+                    message: 請求參數驗證失敗
+                    data:
+                      errors:
+                        - field: username
+                          message: 使用者名稱不可為空
+                        - field: password
+                          message: 密碼長度須為 8-128 字元
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: b2c3d4e5-f6a7-8901-bcde-f12345678901
+
+        '401':
+          description: 認證失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_credentials:
+                  summary: 帳號或密碼錯誤
+                  value:
+                    code: 401
+                    message: 帳號或密碼錯誤
+                    data: null
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: c3d4e5f6-a7b8-9012-cdef-234567890123
+
+        '403':
+          description: 帳號已鎖定
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                account_locked:
+                  summary: 帳號鎖定
+                  value:
+                    code: 403
+                    message: 帳號已鎖定，請於 15 分鐘後再試
+                    data:
+                      lockUntil: 1732537500
+                      remainingSeconds: 840
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: d4e5f6a7-b8c9-0123-def0-345678901234
+
+        '429':
+          description: 請求過於頻繁
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rate_limit:
+                  summary: 限流
+                  value:
+                    code: 429
+                    message: 請求過於頻繁，請稍後再試
+                    data:
+                      retryAfter: 60
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: e5f6a7b8-c9d0-1234-ef01-456789012345
+
+        '500':
+          description: 伺服器內部錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                server_error:
+                  summary: 伺服器錯誤
+                  value:
+                    code: 500
+                    message: 伺服器內部錯誤，請稍後再試
+                    data: null
+                    timestamp: 2025-11-25T10:30:00Z
+                    traceId: f6a7b8c9-d0e1-2345-f012-567890123456
+
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: 使用者登出
+      description: |
+        撤銷當前 JWT Token，將 Token 加入 Redis 黑名單。
+        
+        **業務邏輯**：
+        1. 從 Authorization header 提取 JWT Token
+        2. 驗證 Token 有效性（未過期、未在黑名單）
+        3. 解析 Token 取得 jti (JWT ID)
+        4. 將 jti 加入 Redis 黑名單（Key: auth:blacklist:{jti}, TTL: Token 剩餘有效期）
+        5. 記錄登出日誌（user_id, tenant_id, IP, 時間戳）
+        
+        **安全考量**：
+        - Token 加入黑名單後立即失效，無法再次使用
+        - Redis TTL 確保過期 Token 自動清理，無需手動維護
+
+      operationId: logout
+      security:
+        - BearerAuth: []
+
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              examples:
+                success:
+                  summary: 登出成功
+                  value:
+                    code: 200
+                    message: 登出成功
+                    data: null
+                    timestamp: 2025-11-25T10:35:00Z
+                    traceId: a2b3c4d5-e6f7-8901-abcd-ef2345678901
+
+        '401':
+          description: 未認證或 Token 無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_token:
+                  summary: 缺少 Token
+                  value:
+                    code: 401
+                    message: 未提供認證 Token
+                    data: null
+                    timestamp: 2025-11-25T10:35:00Z
+                    traceId: b3c4d5e6-f7a8-9012-bcde-f23456789012
+                invalid_token:
+                  summary: Token 無效
+                  value:
+                    code: 401
+                    message: Token 無效或已過期
+                    data: null
+                    timestamp: 2025-11-25T10:35:00Z
+                    traceId: c4d5e6f7-a8b9-0123-cdef-234567890123
+
+        '500':
+          description: 伺服器內部錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: 取得當前使用者資訊
+      description: |
+        從 JWT Token 提取使用者資訊並返回。
+        
+        **業務邏輯**：
+        1. 從 Authorization header 提取 JWT Token
+        2. 驗證 Token 有效性（未過期、未在黑名單）
+        3. 解析 Token 取得使用者資訊（user_id, username, tenant_id, roles）
+        4. 從 UserRepository 查詢完整使用者資訊（email, lastLoginAt）
+        5. 返回 UserInfoResponse
+        
+        **應用場景**：
+        - 前端頁面初始化時取得使用者資訊
+        - 驗證 Token 是否仍然有效
+        - 取得使用者權限用於前端路由控制
+
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+
+      responses:
+        '200':
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoSuccessResponse'
+              examples:
+                admin:
+                  summary: 管理員資訊
+                  value:
+                    code: 200
+                    message: 查詢成功
+                    data:
+                      userId: 1
+                      username: admin
+                      tenantId: 1
+                      roles:
+                        - ROLE_ADMIN
+                      email: admin@example.com
+                      lastLoginAt: 2025-11-25T10:30:00Z
+                    timestamp: 2025-11-25T10:36:00Z
+                    traceId: d5e6f7a8-b9c0-1234-def0-345678901234
+                user:
+                  summary: 一般使用者資訊
+                  value:
+                    code: 200
+                    message: 查詢成功
+                    data:
+                      userId: 2
+                      username: john
+                      tenantId: 1
+                      roles:
+                        - ROLE_USER
+                      email: john@example.com
+                      lastLoginAt: 2025-11-25T09:45:00Z
+                    timestamp: 2025-11-25T10:36:00Z
+                    traceId: e6f7a8b9-c0d1-2345-ef01-456789012345
+
+        '401':
+          description: 未認證或 Token 無效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                token_expired:
+                  summary: Token 已過期
+                  value:
+                    code: 401
+                    message: Token 已過期，請重新登入
+                    data: null
+                    timestamp: 2025-11-25T10:36:00Z
+                    traceId: f7a8b9c0-d1e2-3456-f012-567890123456
+
+        '500':
+          description: 伺服器內部錯誤
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Token 認證
+        
+        **使用方式**：
+        ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        ```
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_]{3,50}$'
+          description: 使用者名稱（3-50 字元，只允許字母、數字、底線）
+          example: admin
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          format: password
+          description: 密碼（8-128 字元，明文傳輸需使用 HTTPS）
+          example: admin123
+        captcha:
+          type: string
+          minLength: 4
+          maxLength: 6
+          description: 驗證碼（選擇性，初版可不實作）
+          example: AB12
+
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - tokenType
+        - expiresIn
+        - expiresAt
+        - userId
+        - username
+        - tenantId
+        - roles
+      properties:
+        token:
+          type: string
+          description: JWT Token（前端需儲存至 localStorage 或 sessionStorage）
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ0ZW5hbnRfaWQiOjEsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjUzNjYwMCwiZXhwIjoxNzMyNjIzMDAwLCJqdGkiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAifQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        tokenType:
+          type: string
+          enum: [Bearer]
+          description: Token 類型（固定為 Bearer）
+          example: Bearer
+        expiresIn:
+          type: integer
+          format: int64
+          description: Token 有效期（秒，24 小時 = 86400 秒）
+          example: 86400
+        expiresAt:
+          type: integer
+          format: int64
+          description: Token 過期時間戳記（Unix timestamp，秒）
+          example: 1732623000
+        userId:
+          type: integer
+          format: int64
+          description: 使用者 ID
+          example: 1
+        username:
+          type: string
+          description: 使用者名稱
+          example: admin
+        tenantId:
+          type: integer
+          format: int64
+          description: 租戶 ID
+          example: 1
+        roles:
+          type: array
+          items:
+            type: string
+          description: 使用者角色列表
+          example:
+            - ROLE_ADMIN
+
+    UserInfoResponse:
+      type: object
+      required:
+        - userId
+        - username
+        - tenantId
+        - roles
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: 使用者 ID
+          example: 1
+        username:
+          type: string
+          description: 使用者名稱
+          example: admin
+        tenantId:
+          type: integer
+          format: int64
+          description: 租戶 ID
+          example: 1
+        roles:
+          type: array
+          items:
+            type: string
+          description: 使用者角色列表
+          example:
+            - ROLE_ADMIN
+        email:
+          type: string
+          format: email
+          description: 電子郵件（選擇性）
+          example: admin@example.com
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最後登入時間（ISO 8601 格式）
+          example: 2025-11-25T10:30:00Z
+
+    LoginSuccessResponse:
+      type: object
+      required:
+        - code
+        - message
+        - data
+        - timestamp
+        - traceId
+      properties:
+        code:
+          type: integer
+          description: 狀態碼（200 表示成功）
+          example: 200
+        message:
+          type: string
+          description: 回應訊息
+          example: 登入成功
+        data:
+          $ref: '#/components/schemas/LoginResponse'
+        timestamp:
+          type: string
+          format: date-time
+          description: 伺服器時間戳記（ISO 8601 格式）
+          example: 2025-11-25T10:30:00Z
+        traceId:
+          type: string
+          format: uuid
+          description: 追蹤 ID（用於日誌關聯）
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+    UserInfoSuccessResponse:
+      type: object
+      required:
+        - code
+        - message
+        - data
+        - timestamp
+        - traceId
+      properties:
+        code:
+          type: integer
+          description: 狀態碼（200 表示成功）
+          example: 200
+        message:
+          type: string
+          description: 回應訊息
+          example: 查詢成功
+        data:
+          $ref: '#/components/schemas/UserInfoResponse'
+        timestamp:
+          type: string
+          format: date-time
+          description: 伺服器時間戳記（ISO 8601 格式）
+          example: 2025-11-25T10:36:00Z
+        traceId:
+          type: string
+          format: uuid
+          description: 追蹤 ID（用於日誌關聯）
+          example: d5e6f7a8-b9c0-1234-def0-345678901234
+
+    SuccessResponse:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+        - traceId
+      properties:
+        code:
+          type: integer
+          description: 狀態碼（200 表示成功）
+          example: 200
+        message:
+          type: string
+          description: 回應訊息
+          example: 操作成功
+        data:
+          type: object
+          nullable: true
+          description: 回應資料（可為 null）
+        timestamp:
+          type: string
+          format: date-time
+          description: 伺服器時間戳記（ISO 8601 格式）
+          example: 2025-11-25T10:35:00Z
+        traceId:
+          type: string
+          format: uuid
+          description: 追蹤 ID（用於日誌關聯）
+          example: a2b3c4d5-e6f7-8901-abcd-ef2345678901
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+        - traceId
+      properties:
+        code:
+          type: integer
+          description: 錯誤碼
+          example: 401
+        message:
+          type: string
+          description: 錯誤訊息
+          example: 帳號或密碼錯誤
+        data:
+          type: object
+          nullable: true
+          description: 錯誤詳細資訊（可為 null）
+        timestamp:
+          type: string
+          format: date-time
+          description: 伺服器時間戳記（ISO 8601 格式）
+          example: 2025-11-25T10:30:00Z
+        traceId:
+          type: string
+          format: uuid
+          description: 追蹤 ID（用於日誌關聯）
+          example: c3d4e5f6-a7b8-9012-cdef-234567890123
+
+security:
+  - BearerAuth: []

@@ -241,13 +241,17 @@
 - [X] T071 [P] 在 backend/rbac-common/ 建立 README.md，包含模組概述和使用範例
 - [X] T072 [P] 在 backend/rbac-common/ 建立 CHANGELOG.md，記錄初始版本
 - [X] T073 在 backend/rbac-common/rbac-common-web/src/main/resources 建立 logback-spring.xml，包含 Trace ID 的 MDC 模式
-- [ ] T074 為所有公開 API 新增 Javadoc 註解（CacheService、DistributedLock、UserContext、Result 等）
-- [ ] T075 執行 mvn clean install 以驗證所有模組編譯成功
-- [ ] T076 執行 mvn test 以確保所有單元測試和整合測試通過
+- [X] T074 為所有公開 API 新增 Javadoc 註解（CacheService、DistributedLock、UserContext、Result 等）
+- [X] T075 執行 mvn clean install 以驗證所有模組編譯成功
+- [X] T076 執行 mvn test 以確保所有單元測試和整合測試通過
 - [ ] T077 使用 JaCoCo 驗證程式碼覆蓋率達到 70%+ 目標
-- [ ] T078 建立 docker-compose.yml 用於 PostgreSQL 和 Redis 測試環境
-- [ ] T079 按照步驟驗證 quickstart.md 說明
-- [ ] T080 程式碼審查重點關注租戶隔離強制執行和 ThreadLocal 清理
+  - **狀態**: 覆蓋率檢查完成，但未達到 70% 目標
+  - **實際覆蓋率**: ~35% (Core: 40%, Database: 2%, Redis: 46%, Web: 28%)
+  - **問題**: Database 模組覆蓋率過低 (僅 2%)
+  - **建議**: 為 Database 模組新增更多單元測試，特別是配置和實體類測試
+- [X] T078 建立 docker-compose.yml 用於 PostgreSQL 和 Redis 測試環境
+- [X] T079 按照步驟驗證 quickstart.md 說明
+- [X] T080 程式碼審查重點關注租戶隔離強制執行和 ThreadLocal 清理
 
 ---
 
