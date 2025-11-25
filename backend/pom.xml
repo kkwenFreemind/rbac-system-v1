@@ -69,6 +69,7 @@
         <module>rbac-common/rbac-common-redis</module>
         <module>rbac-common/rbac-common-web</module>
         <module>rbac-auth</module>
+        <module>rbac-tenant</module>
     </modules>
 
     <dependencyManagement>

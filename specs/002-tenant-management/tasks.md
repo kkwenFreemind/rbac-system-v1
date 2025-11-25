@@ -20,7 +20,7 @@
 
 ### Tasks
 
-- [ ] T001 建立 Maven 模組 backend/rbac-tenant/pom.xml，依賴 rbac-common-core、rbac-common-database、rbac-common-redis、rbac-common-web
+- [X] T001 建立 Maven 模組 backend/rbac-tenant/pom.xml，依賴 rbac-common-core、rbac-common-database、rbac-common-redis、rbac-common-web
 - [ ] T002 建立 Spring Boot 主類別 TenantApplication.java 在 com.rbac.tenant 套件
 - [ ] T003 建立 application.yml 主配置檔，設定 Spring Boot 基本參數（server.port=8081, spring.application.name=rbac-tenant）
 - [ ] T004 建立 application-dev.yml 開發環境配置，包含 PostgreSQL 連線設定和 Redis 連線設定
