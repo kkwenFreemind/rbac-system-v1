@@ -10,14 +10,18 @@ import com.rbac.auth.model.entity.UserStatus;
 import com.rbac.auth.repository.UserRepository;
 import com.rbac.common.redis.util.CacheService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -180,5 +184,26 @@ class AuthServiceTest {
 
         // Verify 記錄失敗嘗試
         verify(cacheService).set("auth:attempts:nonexistent", 1, 3600);
+    }
+
+    @Test
+    @DisplayName("登出成功 - Token 加入黑名單")
+    void testLogoutSuccess() {
+        // Given
+        String token = "valid.jwt.token";
+        String jti = "test-jti-123";
+        long expectedTtlSeconds = 3600L; // 1 hour in seconds
+
+        Claims claims = mock(Claims.class);
+        when(claims.getId()).thenReturn(jti);
+
+        when(jwtTokenService.extractClaims(token)).thenReturn(claims);
+        when(jwtTokenService.calculateRemainingValidity(token)).thenReturn(expectedTtlSeconds);
+
+        // When
+        authService.logout(token);
+
+        // Then
+        verify(jwtTokenService).addToBlacklist(jti, expectedTtlSeconds);
     }
 }

@@ -53,7 +53,7 @@ public class AuthController {
      * @return 登出結果
      */
     @PostMapping("/logout")
-    public Result<Void> logout(@RequestHeader("Authorization") String authorization) {
+    public Result<Void> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             return Result.error(401, "無效的授權標頭");
         }
@@ -61,7 +61,7 @@ public class AuthController {
         String token = authorization.substring(7); // Remove "Bearer " prefix
 
         // 實作登出邏輯
-        ((com.rbac.auth.service.AuthServiceImpl) authService).logout(token);
+        authService.logout(token);
 
         log.info("User logged out successfully");
         return Result.success(null);

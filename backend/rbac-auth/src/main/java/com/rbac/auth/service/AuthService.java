@@ -27,6 +27,13 @@ public interface AuthService {
     void logout();
 
     /**
+     * 使用者登出（帶 Token）
+     *
+     * @param token JWT Token
+     */
+    void logout(String token);
+
+    /**
      * 驗證密碼
      *
      * @param username 使用者名稱

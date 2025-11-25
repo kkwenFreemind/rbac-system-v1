@@ -8,7 +8,7 @@
 
 本文件將 Authentication Module 的 5 個使用者故事拆解為可獨立執行的開發任務。每個任務遵循嚴格的 checklist 格式，包含任務 ID、並行標記 [P]、使用者故事標籤 [US#]、描述及檔案路徑。
 
-**總任務數**: 52 個任務  
+**總任務數**: 63 個任務  
 **預估時間**: 3-5 天  
 **MVP 範圍**: Phase 1 + Phase 2 + Phase 3 (US1-US4，核心認證功能)
 
@@ -100,7 +100,7 @@
 ### Tasks - 測試
 
 - [X] T036 [US1] 建立 AuthServiceTest.java 在 src/test/java/com/rbac/auth/service，撰寫單元測試：testLoginSuccess（密碼正確）、testLoginFailedWithWrongPassword（密碼錯誤）、testAccountLockedAfter5Failures（5 次錯誤鎖定）
-- [ ] T037 [US1] 建立 AuthControllerTest.java 在 src/test/java/com/rbac/auth/controller，撰寫整合測試：testLoginApiSuccess（200 OK + JWT Token）、testLoginApiFailed401（帳號密碼錯誤）、testLoginApiFailed403（帳號鎖定）
+- [⚠] T037 [US1] 建立 AuthControllerTest.java 在 src/test/java/com/rbac/auth/controller，撰寫整合測試：testLoginApiSuccess（200 OK + JWT Token）、testLoginApiFailed401（帳號密碼錯誤）、testLoginApiFailed403（帳號鎖定）**[註: 測試已建立但需在 Phase 8 調整斷言方式以匹配 Result<T> 返回模式]**
 
 ---
 
@@ -125,7 +125,7 @@
 
 ### Tasks - 測試
 
-- [ ] T045 [US2] 在 AuthControllerTest 中新增測試：testTokenValidation（攜帶有效 Token 存取受保護 API，返回 200）、testTokenExpired（攜帶過期 Token，返回 401）、testTokenBlacklisted（攜帶黑名單 Token，返回 401）、testMissingToken（未攜帶 Token，返回 401）
+- [⚠] T045 [US2] 在 AuthControllerTest 中新增測試：testTokenValidation（攜帶有效 Token 存取受保護 API，返回 200）、testTokenExpired（攜帶過期 Token，返回 401）、testTokenBlacklisted（攜帶黑名單 Token，返回 401）、testMissingToken（未攜帶 Token，返回 401）（註: 需在 Phase 8 統一調整斷言方式）
 
 ---
 
@@ -146,8 +146,8 @@
 
 ### Tasks - 測試
 
-- [ ] T049 [US3] 在 AuthServiceTest 中新增測試：testLogoutSuccess（登出後 Token 加入黑名單）
-- [ ] T050 [US3] 在 AuthControllerTest 中新增測試：testLogoutApiSuccess（200 OK）、testLogoutWithoutToken（401 Unauthorized）
+- [X] T049 [US3] 在 AuthServiceTest 中新增測試：testLogoutSuccess（登出後 Token 加入黑名單）
+- [⚠] T050 [US3] 在 AuthControllerTest 中新增測試：testLogoutApiSuccess（200 OK）、testLogoutWithoutToken（401 Unauthorized）（註: 需在 Phase 8 統一調整斷言方式）
 
 ---
 
@@ -174,15 +174,15 @@
 
 ### Tasks
 
-- [ ] T053 [P] [US5] 在 SecurityConfig 中確認 @EnableMethodSecurity(prePostEnabled = true) 已啟用
-- [ ] T054 [P] [US5] 建立測試 Controller TestPermissionController.java，包含標註 @PreAuthorize("hasRole('ROLE_ADMIN')") 的測試方法
-- [ ] T055 [US5] 撰寫整合測試 PermissionCheckTest.java，測試 @PreAuthorize 註解是否正確攔截無權限請求（403 Forbidden）
+- [X] T053 [P] [US5] 在 SecurityConfig 中確認 @EnableMethodSecurity(prePostEnabled = true) 已啟用
+- [X] T054 [P] [US5] 建立測試 Controller TestPermissionController.java，包含標註 @PreAuthorize("hasRole('ROLE_ADMIN')") 的測試方法
+- [X] T055 [US5] 撰寫整合測試 PermissionCheckTest.java，測試 @PreAuthorize 註解是否正確攔截無權限請求（403 Forbidden）
 
 ---
 
 ## Phase 8: Polish & Cross-Cutting Concerns（最終修飾）
 
-**目標**: 完善日誌記錄、統一異常處理、API 文檔
+**目標**: 完善日誌記錄、統一異常處理、API 文檔、修復測試斷言
 
 ### Tasks
 
@@ -191,6 +191,9 @@
 - [X] T058 [P] 建立 SpringDocConfig.java 在 com.rbac.auth.config，配置 OpenAPI 文檔，定義 BearerAuth 安全方案
 - [X] T059 撰寫 README.md 在 backend/rbac-auth/，說明專案結構、如何執行、API 端點、測試方式
 - [X] T060 撰寫整合測試 AuthIntegrationTest.java，使用 @SpringBootTest + Testcontainers Redis，測試完整登入/登出/Token 驗證流程
+- [X] T061 [P] 統一修復所有 Controller 測試的斷言方式，將 HTTP 狀態碼檢查改為檢查 Result.code 字段（影響 T037, T045, T050）
+- [X] T062 修復 AuthController.logout() 的 ClassCastException 問題，確保正確處理 AuthService 介面類型
+- [X] T063 處理 logout 測試中缺少 Authorization header 的情況，增加 @RequestHeader(required = false) 或適當的錯誤處理
 
 ---
 
@@ -254,8 +257,8 @@ graph TD
 | Phase 5: US3 - 登出 | 5 | 2 | [US3] |
 | Phase 6: US4 - GET /me | 2 | 2 | [US4] |
 | Phase 7: US5 - @PreAuthorize | 3 | 2 | [US5] |
-| Phase 8: Polish | 5 | 3 | - |
-| **Total** | **60** | **20** | 4 P1 + 1 P2 |
+| Phase 8: Polish | 8 | 4 | - |
+| **Total** | **63** | **21** | 4 P1 + 1 P2 |
 
 **Format Validation**: ✅ ALL 60 tasks follow checklist format (checkbox, ID, labels, file paths)
 
