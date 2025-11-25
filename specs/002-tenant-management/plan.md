@@ -1,7 +1,7 @@
 # Implementation Plan: 租戶管理模組
 
-**Branch**: `001-tenant-management` | **Date**: 2025-11-24 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/001-tenant-management/spec.md`
+**Branch**: `002-tenant-management` | **Created**: 2025-11-24 | **Updated**: 2025-11-25 | **Spec**: [spec.md](spec.md)
+**Input**: Feature specification from `/specs/002-tenant-management/spec.md`
 
 ## Summary
 

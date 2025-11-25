@@ -1,17 +1,18 @@
 # 功能規格：租戶管理模組
 
-**功能分支**: `001-tenant-management`  
+**功能分支**: `002-tenant-management`  
 **建立日期**: 2025-11-24  
-**狀態**: 🔴 BLOCKED - 等待 Authentication Module 完成  
+**更新日期**: 2025-11-25  
+**狀態**: ✅ READY - Authentication Module 已完成  
 **輸入**: 使用者描述：「租戶模組包含 CRUD 操作、TenantContextHolder 用於租戶上下文管理、TenantFilter 用於自動注入 tenant_id，以及行級隔離策略實作」
 
 ---
 
-## ⚠️ CRITICAL BLOCKER: Authentication Module Required
+## ✅ Prerequisites Completed: Authentication Module
 
-**Status**: 🔴 **BLOCKED** - 租戶管理模組依賴認證模組
+**Status**: ✅ **READY** - 認證模組已完成並合併到 master
 
-### 阻塞原因
+### 已滿足的前置條件
 
 租戶管理模組的核心功能依賴於認證模組提供的以下能力：
 
@@ -22,23 +23,22 @@
 
 ### 前置需求檢查清單
 
-在開始租戶模組實作之前，Authentication Module 必須完成：
+Authentication Module 已完成以下功能：
 
-- [ ] **AUTH-001** JWT Token 生成/驗證（包含 `tenant_id` claim）
-- [ ] **AUTH-002** UserContext 實作（提供 `getCurrentUser()` 和 `getTenantId()`）
-- [ ] **AUTH-003** 登入/登出 API 端點（POST /api/v1/auth/login, /logout）
-- [ ] **AUTH-004** Spring Security @PreAuthorize 註解支援
-- [ ] **AUTH-005** Redis Session 管理（Token 黑名單）
+- [X] **AUTH-001** JWT Token 生成/驗證（包含 `tenant_id` claim）
+- [X] **AUTH-002** UserContext 實作（提供 `getCurrentUser()` 和 `getTenantId()`）
+- [X] **AUTH-003** 登入/登出 API 端點（POST /api/v1/auth/login, /logout）
+- [X] **AUTH-004** Spring Security @PreAuthorize 註解支援
+- [X] **AUTH-005** Redis Session 管理（Token 黑名單）
 
-**預估 Auth Module 開發時間**: 3-5 天（單人）
+**Auth Module 實際開發時間**: 3 天（已完成並合併到 master）
 
 ### 下一步行動
 
-1. ✅ 提交當前租戶模組設計文件
-2. ✅ 切換到 `000-authentication` 分支
-3. 🔄 完成 Authentication Module 規格設計
-4. 🔄 實作 Authentication Module
-5. ⏳ 回到此分支繼續租戶模組實作
+1. ✅ Auth Module 規格設計完成
+2. ✅ Auth Module 實作完成
+3. ✅ Auth Module 合併到 master
+4. ➡️ **開始租戶模組實作**（當前分支：002-tenant-management）
 
 ---
 
